@@ -7,7 +7,7 @@ export const Homepage = () => {
 
 
   return (
-    <Box minHeight="100vh">
+    <Box minHeight="100vh" sx={{background: '#1f2833'}}>
       <PageTitle />
     </Box>
   )

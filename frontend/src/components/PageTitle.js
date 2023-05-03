@@ -1,4 +1,5 @@
 import { Typography, Box, Stack, Grid, Button } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 export const PageTitle = () => {
   return (
@@ -18,15 +19,18 @@ export const PageTitle = () => {
       spacing={8}>
 
         <Box>
-          <Typography variant='h1' component='h1'>
+          <Typography variant='h1' component='h1' color='#c5c6c7'>
             Bible TimeLine
           </Typography>
         </Box>
 
         <Stack direction='row' justifyContent='center' spacing={8} sx={{marginTop: '70px'}}>
-          <Button variant='outlined' size='large'>Easy</Button>
+          {/* <Button variant='outlined' size='large'>Easy</Button>
           <Button variant='outlined' size='large'>Medium</Button>
-          <Button variant='outlined' size='large'>Hard</Button>
+          <Button variant='outlined' size='large'>Hard</Button> */}
+          <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
+            <Typography variant='h4'>START</Typography>
+            </Link>
         </Stack>
 
       </Box>
