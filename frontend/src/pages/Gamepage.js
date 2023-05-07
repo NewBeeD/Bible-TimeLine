@@ -1,43 +1,60 @@
 import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar } from "@mui/material"
 import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
+import { useState } from "react"
 
 export const Gamepage = () => {
+
+  const [data, setData] = useState(dataEntry)
+
+  const handleDragDrop = (result) => {
+
+    if(!result.destination){return}
+
+    const items = Array.from(data)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
+
+    setData(items)
+  }
 
 
   return (
 
     <div>
-      <Container maxWidth='sm'>
 
-        <DragDropContext>
+      
+      <Container maxWidth='sm' sx={{border: '2px solid blue', marginTop: '200px'}}>
+
+        <DragDropContext onDragEnd={handleDragDrop}>
 
           <Droppable droppableId="list">
 
             {(provided) => (
 
-              <List {...provided.droppableProps} ref={provided.innerRef} sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
+              <List 
+              {...provided.droppableProps} 
+              ref={provided.innerRef} 
+              sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
 
-              {data.map(({id, title}, index)=> {
-                return(
+              {data && data.map((points, index)=> (
+                
+                <Draggable key={points.id} draggableId={points.id} index={index}>
 
-                  <Draggable key={id} draggableId={id.toString()} index={index}>
+                {(provided) => (
 
-                    {(provided) => (
+                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '10px'}}>
 
-                      <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '10px'}}>
+                    <ListItem>
+                      <ListItemText primary={points.title} />
+                    </ListItem>
 
-                        <ListItem>
-                          <ListItemText primary={title} />
-                        </ListItem>
+                  </Paper>
 
-                      </Paper>
+                )}
 
-                    )}
-
-                  </Draggable>
-                )
-              })}
+              </Draggable>
+              ))}
 
 
             </List>
@@ -54,7 +71,7 @@ export const Gamepage = () => {
 
 
 
-const data = [
+const dataEntry = [
   {
     id: '1',
     title: 'Abraham departs from the land of Nod'
