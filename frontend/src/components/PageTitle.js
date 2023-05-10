@@ -1,10 +1,13 @@
 import { Typography, Box, Stack, Grid, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
 export const PageTitle = () => {
-  return (
 
-    
+  const [active, setActive] = useState(0)
+ 
+  
+  return (
 
     <Box 
     display='flex'
@@ -24,7 +27,14 @@ export const PageTitle = () => {
           </Typography>
         </Box>
 
-        <Stack direction='row' justifyContent='center' spacing={8} sx={{marginTop: '70px'}}>
+        <Stack direction='row' justifyContent='center' spacing={2} sx={{marginTop: '120px'}}>
+          <Button variant='outlined' onClick={() => setActive(1)} ><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(2)} sx={{color: (active === 2? 'red': 'white')}}><Typography variant='body1'>New Testament</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Mixed</Typography></Button>
+        </Stack>
+
+
+        <Stack direction='row' justifyContent='center' spacing={2} sx={{marginTop: '40px'}}>
           {/* <Button variant='outlined' size='large'>Easy</Button>
           <Button variant='outlined' size='large'>Medium</Button>
           <Button variant='outlined' size='large'>Hard</Button> */}

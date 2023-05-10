@@ -1,11 +1,25 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button } from "@mui/material"
 import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import { useState } from "react"
+import { numberGen } from "../modules/numberGen"
+
 
 export const Gamepage = () => {
 
-  const [data, setData] = useState(dataEntry)
+  
+
+
+  const [data, setData] = useState(numberGen())
+
+  const nextSet = () =>{}
+  const resetData = () =>{}
+
+  console.log(data);
+
+
+
+
 
   const handleDragDrop = (result) => {
 
@@ -23,8 +37,10 @@ export const Gamepage = () => {
 
     <div>
 
+      <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '60px'}}>Bible TimeLine</Typography>
+
       
-      <Container maxWidth='sm' sx={{border: '2px solid blue', marginTop: '200px'}}>
+      <Container maxWidth='sm' sx={{ marginTop: '60px', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
 
         <DragDropContext onDragEnd={handleDragDrop}>
 
@@ -35,18 +51,18 @@ export const Gamepage = () => {
               <List 
               {...provided.droppableProps} 
               ref={provided.innerRef} 
-              sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
+              sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper', textAlign: 'center'}}>
 
               {data && data.map((points, index)=> (
                 
-                <Draggable key={points.id} draggableId={points.id} index={index}>
+                <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
 
                 {(provided) => (
 
-                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '10px'}}>
+                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px'}}>
 
-                    <ListItem>
-                      <ListItemText primary={points.title} />
+                    <ListItem sx={{textAlign: "center"}}>
+                      <ListItemText  primary={points.event} />
                     </ListItem>
 
                   </Paper>
@@ -56,6 +72,8 @@ export const Gamepage = () => {
               </Draggable>
               ))}
 
+              {provided.placeholder}
+
 
             </List>
             )}
@@ -63,8 +81,12 @@ export const Gamepage = () => {
           </Droppable>
         </DragDropContext>
 
-
       </Container>
+
+      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '30px'}}>
+          <Button variant="outlined" color="secondary" onClick={nextSet}>Next</Button>
+          <Button variant="outlined" color="secondary" onClick={resetData}>Reset</Button>
+      </Stack>
     </div>
   )
 }
