@@ -3,22 +3,23 @@ import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import { useState } from "react"
 import { numberGen } from "../modules/numberGen"
+import { Link } from "react-router-dom"
+import { useTimeLineContext } from "../hooks/useTimeLineContext"
+
 
 
 export const Gamepage = () => {
 
-  
+
+  const {difficulty, dispatch} = useTimeLineContext()  
+  const [data, setData] = useState(numberGen(difficulty))
 
 
-  const [data, setData] = useState(numberGen())
-
-  const nextSet = () =>{}
-  const resetData = () =>{}
-
-  console.log(data);
+  console.log(difficulty);
 
 
-
+  const nextSet = () =>{setData(numberGen(difficulty))}
+  // const resetData = () =>{setData(reset)}
 
 
   const handleDragDrop = (result) => {
@@ -36,6 +37,8 @@ export const Gamepage = () => {
   return (
 
     <div>
+
+      <Button><Typography variant="h4" sx={{marginLeft: '40px', marginTop: '40px'}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
 
       <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '60px'}}>Bible TimeLine</Typography>
 
@@ -84,8 +87,8 @@ export const Gamepage = () => {
       </Container>
 
       <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '30px'}}>
+          <Button variant="outlined" color="secondary" >Reset</Button>
           <Button variant="outlined" color="secondary" onClick={nextSet}>Next</Button>
-          <Button variant="outlined" color="secondary" onClick={resetData}>Reset</Button>
       </Stack>
     </div>
   )
@@ -93,33 +96,3 @@ export const Gamepage = () => {
 
 
 
-const dataEntry = [
-  {
-    id: '1',
-    title: 'Abraham departs from the land of Nod'
-  },
-  {
-    id: '2',
-    title: 'David Kills Goliath'
-  },
-  {
-    id: '3',
-    title: 'Joshua becomes the first Judge'
-  },
-  {
-    id: '4',
-    title: 'Solomon Prays for Wisdom'
-  },
-  {
-    id: '5',
-    title: 'Hannah prays for a Child'
-  },
-  {
-    id: '6',
-    title: 'Samuel hears God"s Voice'
-  },
-  {
-    id: '7',
-    title: 'Eli is saddened by the loss of the Ark'
-  }
-]
