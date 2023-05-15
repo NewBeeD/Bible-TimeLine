@@ -3,8 +3,11 @@ import { timelineData } from "../data/csvjson"
 export const numberGen = (value) => {
 
   const [oldTest, newTest] = [0, 473];
+  let list = [];
 
-  const events = [];
+  let bool = true;
+
+  let events = [];
   let start_point = 0;
   let end_point = 0;
 
@@ -26,12 +29,35 @@ export const numberGen = (value) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
-  for(let i = 0; i < 4; i++){
+  function arrGen(){
 
-    let value = randomIntFromInterval(start_point, end_point)
+    for(let i = 0; i < 5; i++){
 
-    events.push(timelineData[value - 1])
+      let randomNum = randomIntFromInterval(start_point, end_point)
+
+      if(!list.includes(randomNum)){list.push(randomNum)}
+  
+    }
   }
+
+
+
+  function eventsAssembler(arr){   
+
+    for(let i = 0; i < arr.length; i++){
+
+      events.push(timelineData[arr[i] - 1])
+    }
+}
+ 
+
+  function eventsFinder(){
+
+    arrGen()
+    eventsAssembler(list)
+  }
+
+  eventsFinder()
 
   return events;
   

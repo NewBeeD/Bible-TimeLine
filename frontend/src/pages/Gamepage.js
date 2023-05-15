@@ -14,13 +14,8 @@ export const Gamepage = () => {
   const {difficulty, dispatch} = useTimeLineContext()  
   const [data, setData] = useState(numberGen(difficulty))
 
-
-  console.log(difficulty);
-
-
   const nextSet = () =>{setData(numberGen(difficulty))}
   // const resetData = () =>{setData(reset)}
-
 
   const handleDragDrop = (result) => {
 
@@ -33,12 +28,16 @@ export const Gamepage = () => {
     setData(items)
   }
 
+  const changeCategory = () =>{
+    dispatch({type: 'SET_DIFFICULTY', payload: null})
+  }
+
 
   return (
 
     <div>
 
-      <Button><Typography variant="h4" sx={{marginLeft: '40px', marginTop: '40px'}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
+      <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: '40px', marginTop: '40px'}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
 
       <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '60px'}}>Bible TimeLine</Typography>
 
