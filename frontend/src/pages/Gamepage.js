@@ -5,6 +5,8 @@ import { useState } from "react"
 import { numberGen } from "../modules/numberGen"
 import { Link } from "react-router-dom"
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
+import { eventsCheck } from '../modules/eventsOrderFinder'
+import { orderChecker } from "../modules/orderChecker"
 
 
 
@@ -14,8 +16,17 @@ export const Gamepage = () => {
   const {difficulty, dispatch} = useTimeLineContext()  
   const [data, setData] = useState(numberGen(difficulty))
 
-  const nextSet = () =>{setData(numberGen(difficulty))}
-  // const resetData = () =>{setData(reset)}
+  let newList = [];
+  let eventsOrder = eventsCheck(data)
+
+  
+
+  const nextSet = () =>{
+
+    let bool = orderChecker(eventsOrder, data)
+    if(bool){setData(numberGen(difficulty))}
+  }
+    
 
   const handleDragDrop = (result) => {
 
@@ -32,6 +43,8 @@ export const Gamepage = () => {
     dispatch({type: 'SET_DIFFICULTY', payload: null})
   }
 
+  let order = eventsCheck(data)
+
 
   return (
 
@@ -41,8 +54,7 @@ export const Gamepage = () => {
 
       <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '60px'}}>Bible TimeLine</Typography>
 
-      
-      <Container maxWidth='sm' sx={{ marginTop: '60px', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
+      <Container maxWidth='sm' sx={{ marginTop: '60px', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '400px'}}>
 
         <DragDropContext onDragEnd={handleDragDrop}>
 
@@ -85,7 +97,9 @@ export const Gamepage = () => {
 
       </Container>
 
-      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '30px'}}>
+      
+
+      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '10px'}}>
           <Button variant="outlined" color="secondary" >Reset</Button>
           <Button variant="outlined" color="secondary" onClick={nextSet}>Next</Button>
       </Stack>

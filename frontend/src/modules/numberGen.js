@@ -59,6 +59,8 @@ export const numberGen = (value) => {
 
   eventsFinder()
 
+  // console.log(events);
+
   return events;
   
 }
