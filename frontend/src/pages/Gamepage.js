@@ -7,6 +7,9 @@ import { Link } from "react-router-dom"
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
+import { solution } from "../modules/solution"
+
+
 
 
 
@@ -15,6 +18,8 @@ export const Gamepage = () => {
 
   const {difficulty, dispatch} = useTimeLineContext()  
   const [data, setData] = useState(numberGen(difficulty))
+  const [truth, setTruth] = useState(true)
+  const [animation, setAnimation] = useState(null)
 
   let newList = [];
   let eventsOrder = eventsCheck(data)
@@ -25,10 +30,16 @@ export const Gamepage = () => {
 
     let bool = orderChecker(eventsOrder, data)
     if(bool){setData(numberGen(difficulty))}
+    else{
+      setTruth(false)
+      setAnimation(true)}
   }
     
 
   const handleDragDrop = (result) => {
+
+    setTruth(true)
+    setAnimation(false)
 
     if(!result.destination){return}
 
@@ -41,6 +52,13 @@ export const Gamepage = () => {
 
   const changeCategory = () =>{
     dispatch({type: 'SET_DIFFICULTY', payload: null})
+  }
+
+  const eventSolution = () => {
+
+    let solutionData = solution(eventsOrder, data) 
+    setTruth(true)
+    setData(solutionData)
   }
 
   let order = eventsCheck(data)
@@ -65,7 +83,7 @@ export const Gamepage = () => {
               <List 
               {...provided.droppableProps} 
               ref={provided.innerRef} 
-              sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper', textAlign: 'center'}}>
+              sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
 
               {data && data.map((points, index)=> (
                 
@@ -73,10 +91,10 @@ export const Gamepage = () => {
 
                 {(provided) => (
 
-                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px'}}>
+                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth? 'none': '2px solid red')}} className={(animation? 'shake': '')}>
 
-                    <ListItem sx={{textAlign: "center"}}>
-                      <ListItemText  primary={points.event} />
+                    <ListItem sx={{textAlign: "center"}} >
+                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: '25px'}} />
                     </ListItem>
 
                   </Paper>
@@ -99,10 +117,13 @@ export const Gamepage = () => {
 
       
 
-      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '10px'}}>
-          <Button variant="outlined" color="secondary" >Reset</Button>
-          <Button variant="outlined" color="secondary" onClick={nextSet}>Next</Button>
+      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '0px'}}>
+          
+          <Button variant="outlined" size="large" color="secondary" onClick={nextSet}>Next</Button>
+          <Button variant="outlined" color="secondary" onClick={eventSolution}>Solution</Button>
       </Stack>
+
+
     </div>
   )
 }

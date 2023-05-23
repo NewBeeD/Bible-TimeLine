@@ -31,7 +31,7 @@ export const numberGen = (value) => {
 
   function arrGen(){
 
-    for(let i = 0; i < 5; i++){
+    for(let i = 0; i < 4; i++){
 
       let randomNum = randomIntFromInterval(start_point, end_point)
 
