@@ -16,9 +16,10 @@ import { solution } from "../modules/solution"
 export const Gamepage = () => {
 
 
-  const {difficulty, dispatch} = useTimeLineContext()  
+  const {difficulty, dispatch} = useTimeLineContext()
+ 
   const [data, setData] = useState(numberGen(difficulty))
-  const [truth, setTruth] = useState(true)
+  const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
 
   let newList = [];
@@ -31,14 +32,14 @@ export const Gamepage = () => {
     let bool = orderChecker(eventsOrder, data)
     if(bool){setData(numberGen(difficulty))}
     else{
-      setTruth(false)
+      setTruth('red')
       setAnimation(true)}
   }
     
 
   const handleDragDrop = (result) => {
 
-    setTruth(true)
+    setTruth('none')
     setAnimation(false)
 
     if(!result.destination){return}
@@ -57,8 +58,13 @@ export const Gamepage = () => {
   const eventSolution = () => {
 
     let solutionData = solution(eventsOrder, data) 
-    setTruth(true)
+    setTruth('blue')
     setData(solutionData)
+    setTimeout(setBlue, 1500)
+  }
+
+  function setBlue(){
+    setTruth('none')
   }
 
   let order = eventsCheck(data)
@@ -91,7 +97,7 @@ export const Gamepage = () => {
 
                 {(provided) => (
 
-                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth? 'none': '2px solid red')}} className={(animation? 'shake': '')}>
+                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth == 'red'? '2px solid red': truth == 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
 
                     <ListItem sx={{textAlign: "center"}} >
                       <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: '25px'}} />
