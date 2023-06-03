@@ -8,6 +8,8 @@ import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
+import { countDownTimer } from "../components/countDownTimer"
+
 
 
 
@@ -16,9 +18,11 @@ import { solution } from "../modules/solution"
 export const Gamepage = () => {
 
 
-  const {difficulty, dispatch} = useTimeLineContext()
+  // const {difficulty, dispatch} = useTimeLineContext()
+
+  const difficulty = JSON.parse(localStorage.getItem('data'));
  
-  const [data, setData] = useState(numberGen(difficulty))
+  const [data, setData] = useState(numberGen(difficulty.data))
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
 
@@ -30,7 +34,7 @@ export const Gamepage = () => {
   const nextSet = () =>{
 
     let bool = orderChecker(eventsOrder, data)
-    if(bool){setData(numberGen(difficulty))}
+    if(bool){setData(numberGen(difficulty.data))}
     else{
       setTruth('red')
       setAnimation(true)}
@@ -52,7 +56,9 @@ export const Gamepage = () => {
   }
 
   const changeCategory = () =>{
-    dispatch({type: 'SET_DIFFICULTY', payload: null})
+    // dispatch({type: 'SET_DIFFICULTY', payload: null})
+    // localStorage.clear()
+    localStorage.removeItem('data');
   }
 
   const eventSolution = () => {
@@ -72,11 +78,11 @@ export const Gamepage = () => {
 
   return (
 
-    <div>
+    <div minHeight="100vh">
 
-      <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: '40px', marginTop: '40px'}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
+      <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: {xs: '14px'}}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
 
-      <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '60px'}}>Bible TimeLine</Typography>
+      <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '10px', textAlign: 'center'}}>Bible TimeLine</Typography>
 
       <Container maxWidth='sm' sx={{ marginTop: '60px', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '400px'}}>
 

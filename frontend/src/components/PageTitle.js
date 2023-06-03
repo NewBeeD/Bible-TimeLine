@@ -2,6 +2,7 @@ import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField } fro
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
+import { localStorageData } from "../modules/localStorageData"
 
 export const PageTitle = () => {
 
@@ -12,7 +13,12 @@ export const PageTitle = () => {
   const setDifficulty = (value) => {
 
     setActive(value)
-    dispatch({type: 'SET_DIFFICULTY', payload: value})    
+
+    let dataPoint = {category: 'category', data: value}
+
+    let valueString = JSON.stringify(dataPoint)
+   
+    localStorage.setItem('data', valueString)
   }
 
   const handleChange = (e) => {
@@ -35,16 +41,20 @@ export const PageTitle = () => {
       spacing={8}>
 
         <Box>
-          <Typography variant='h1' component='h1' color='#c5c6c7'>
+          <Typography component='h1' color='#c5c6c7' sx={{typography: {sm: 'h1', xs: 'h3'}, textAlign: 'center', marginX: '14px'}}>
             Bible TimeLine
           </Typography>
         </Box>
 
-        <Stack direction='row' justifyContent='center' spacing={2} sx={{marginTop: '120px'}}>
-          <Button variant='outlined' onClick={() => setDifficulty(1)} ><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
+        <Stack justifyContent='center' spacing={2} sx={{marginTop: '120px', marginX: '14px'}}>
+
+          <Button variant='outlined' onClick={() => setDifficulty(1)}><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
+
           <Button variant='outlined' onClick={() => setDifficulty(2)} sx={{color: (active === 2? 'red': 'white')}}><Typography variant='body1'>New Testament</Typography></Button>
 
-          <TextField
+          <Button variant='outlined' onClick={() => setDifficulty(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Mixed</Typography></Button>
+
+          {/* <TextField
           variant='outlined'
           label="Your Choice"
           select
@@ -56,10 +66,10 @@ export const PageTitle = () => {
             <MenuItem value='CHARACTER'>Characters</MenuItem>
             <MenuItem value='BOOKS'>Books</MenuItem>
 
-          </TextField>
+          </TextField> */}
 
 
-          {/* <Button variant='outlined' onClick={() => setDifficulty(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Select</Typography></Button> */}
+         
         </Stack>
 
 
@@ -68,7 +78,9 @@ export const PageTitle = () => {
           <Button variant='outlined' size='large'>Medium</Button>
           <Button variant='outlined' size='large'>Hard</Button> */}
           <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
-            <Typography variant='h4'>START</Typography>
+           
+              <Typography variant='h4'>START</Typography>
+        
             </Link>
         </Stack>
 
