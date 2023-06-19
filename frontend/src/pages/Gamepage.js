@@ -1,4 +1,6 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar } from "@mui/material"
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import { useState, useEffect, useRef } from "react"
@@ -8,7 +10,7 @@ import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
-import { CountDownTimer } from "../components/CountDownTimer"
+
 
 
 
@@ -27,8 +29,10 @@ export const Gamepage = () => {
   const [animation, setAnimation] = useState(null)
   const counterVal = useRef()
   const [btnDisabled, setBtnDisabled] = useState(false)
+  const [score, setScore] = useState(0)
+  const [showScore, setShowScore] = useState(false)
 
-  const [counter, setCounter] = useState(25)
+  const [counter, setCounter] = useState(30)
 
   let newList = [];
   let eventsOrder = eventsCheck(data)
@@ -40,7 +44,8 @@ export const Gamepage = () => {
     let bool = orderChecker(eventsOrder, data)
     if(bool){
       setData(numberGen(difficulty.data))
-      setCounter(25)
+      setCounter(30)
+      setScore((scr) => scr + 10)
     }
     else{
       setTruth('red')
@@ -82,16 +87,10 @@ export const Gamepage = () => {
 
   useEffect(() => {
 
-    // const timeOut = () => setTimeout(counterDecrease, 1000)
-
-    //   if(counter > 0){
-    //     timeOut()
-    // }
-
     counterVal.current = setInterval(decreaseNum, 1000);
     return () => clearInterval(counterVal.current);
 
-  }, [counter])
+  })
 
 
   const decreaseNum = () => {
@@ -105,13 +104,6 @@ export const Gamepage = () => {
       setBtnDisabled(true)
     }};
 
-
-  // function counterDecrease() {
-
-  //   let countVal = counter - 1;
-  //   setCounter(countVal)
-  // }
-
   let order = eventsCheck(data)
 
 
@@ -119,13 +111,46 @@ export const Gamepage = () => {
 
     <div minHeight="100vh" className="gamePage">
 
-      <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: {xs: '14px'}}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
+      <AppBar position="static">
+        <Toolbar >
 
-      <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '10px', textAlign: 'center'}}>Bible TimeLine</Typography>
+        <IconButton
+          size="large"
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          
+         >
+            <MenuIcon />
+          </IconButton>
+
+
+          <Box >
+
+            <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: {xs: '14px'}}}><Link to='/' style={{ textDecoration: 'none', marginLeft: 'auto'}}>Bible TimeLine</Link></Typography></Button>
+
+          </Box>
+
+          
+          
+
+        </Toolbar>
+      </AppBar>
+
+      
+
+
 
       <Box display='flex' justifyContent='center' marginTop={8}>
 
-        <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+        <Box>
+          <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+        </Box>
+
+
+        {showScore && <Box display='flex' alignContent='center' marginLeft={10} color='red' sx={{backgroundColor: 'black', paddingX: '10px'}}>
+          <Typography variant="h3">{ score}</Typography>
+        </Box>}
 
       </Box>
 
