@@ -10,6 +10,7 @@ import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
+import Switch from '@mui/material/Switch';
 
 
 
@@ -111,28 +112,34 @@ export const Gamepage = () => {
 
     <div minHeight="100vh" className="gamePage">
 
-      <AppBar position="static">
-        <Toolbar >
+      <AppBar position="static" >
+        <Toolbar sx={{ justifyContent: "space-between" }}>
 
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          
-         >
-            <MenuIcon />
-          </IconButton>
+          <Box>
+
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+            >
+                <MenuIcon />
+              </IconButton>
+
+          </Box>        
 
 
           <Box >
 
-            <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: {xs: '14px'}}}><Link to='/' style={{ textDecoration: 'none', marginLeft: 'auto'}}>Bible TimeLine</Link></Typography></Button>
+            <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center'}}><Link to='/' style={{textDecoration: 'none'}}>Bible TimeLine</Link></Typography></Button>
 
           </Box>
 
-          
-          
+          <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
+
+            <Typography></Typography>
+            <Switch color="secondary"/>
+          </Box>
 
         </Toolbar>
       </AppBar>
