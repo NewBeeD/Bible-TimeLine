@@ -1,14 +1,14 @@
 import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button } from "@mui/material"
 import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { numberGen } from "../modules/numberGen"
 import { Link } from "react-router-dom"
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
-import { countDownTimer } from "../components/countDownTimer"
+import { CountDownTimer } from "../components/CountDownTimer"
 
 
 
@@ -25,6 +25,10 @@ export const Gamepage = () => {
   const [data, setData] = useState(numberGen(difficulty.data))
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
+  const counterVal = useRef()
+  const [btnDisabled, setBtnDisabled] = useState(false)
+
+  const [counter, setCounter] = useState(25)
 
   let newList = [];
   let eventsOrder = eventsCheck(data)
@@ -34,7 +38,10 @@ export const Gamepage = () => {
   const nextSet = () =>{
 
     let bool = orderChecker(eventsOrder, data)
-    if(bool){setData(numberGen(difficulty.data))}
+    if(bool){
+      setData(numberGen(difficulty.data))
+      setCounter(25)
+    }
     else{
       setTruth('red')
       setAnimation(true)}
@@ -73,18 +80,58 @@ export const Gamepage = () => {
     setTruth('none')
   }
 
+  useEffect(() => {
+
+    // const timeOut = () => setTimeout(counterDecrease, 1000)
+
+    //   if(counter > 0){
+    //     timeOut()
+    // }
+
+    counterVal.current = setInterval(decreaseNum, 1000);
+    return () => clearInterval(counterVal.current);
+
+  }, [counter])
+
+
+  const decreaseNum = () => {
+
+    if(counter > 0){
+      setCounter((prev) => prev - 1)
+    }
+    else{
+      // setCounter(0)
+      clearInterval(counterVal.current);
+      setBtnDisabled(true)
+    }};
+
+
+  // function counterDecrease() {
+
+  //   let countVal = counter - 1;
+  //   setCounter(countVal)
+  // }
+
   let order = eventsCheck(data)
 
 
   return (
 
-    <div minHeight="100vh">
+    <div minHeight="100vh" className="gamePage">
 
       <Button onClick={changeCategory}><Typography variant="h4" sx={{marginLeft: {xs: '14px'}}}><Link to='/' style={{ textDecoration: 'none'}}>HOME</Link></Typography></Button>
 
       <Typography variant="h2" display='flex' justifyContent='center' sx={{marginTop: '10px', textAlign: 'center'}}>Bible TimeLine</Typography>
 
-      <Container maxWidth='sm' sx={{ marginTop: '60px', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '400px'}}>
+      <Box display='flex' justifyContent='center' marginTop={8}>
+
+        <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+
+      </Box>
+
+      
+
+      <Container maxWidth='sm' sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '400px'}}>
 
         <DragDropContext onDragEnd={handleDragDrop}>
 
@@ -131,7 +178,7 @@ export const Gamepage = () => {
 
       <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '0px'}}>
           
-          <Button variant="outlined" size="large" color="secondary" onClick={nextSet}>Next</Button>
+          <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnDisabled}>Next</Button>
           <Button variant="outlined" color="secondary" onClick={eventSolution}>Solution</Button>
       </Stack>
 
