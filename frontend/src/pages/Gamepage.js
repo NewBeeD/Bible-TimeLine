@@ -1,4 +1,4 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
@@ -34,6 +34,7 @@ export const Gamepage = () => {
   const [showScore, setShowScore] = useState(false)
 
   const [counter, setCounter] = useState(30)
+  const [isDrawerOPen, setIsDrawerOpen] = useState(false)
 
   let newList = [];
   let eventsOrder = eventsCheck(data)
@@ -122,6 +123,7 @@ export const Gamepage = () => {
               edge="start"
               color="inherit"
               aria-label="menu"
+              onClick={()=>setIsDrawerOpen(true)}
             >
                 <MenuIcon />
               </IconButton>
@@ -144,11 +146,26 @@ export const Gamepage = () => {
         </Toolbar>
       </AppBar>
 
+      <Drawer anchor="left" 
+      open={isDrawerOPen}
+      onClose={() => setIsDrawerOpen(false)
+      }>
+
+        <Box p={2} width='350px' textAlign='center' role='presentation'>
+
+          <Typography>
+            Side Panel
+          </Typography>
+
+        </Box>
+
+      </Drawer>
+
       
 
 
 
-      <Box display='flex' justifyContent='center' marginTop={8}>
+      <Box display='flex' justifyContent='center' marginTop={18}>
 
         <Box>
           <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
