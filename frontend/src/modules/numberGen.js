@@ -1,6 +1,6 @@
 import { timelineData } from "../data/csvjson"
 
-export const numberGen = (value) => {
+export const numberGen = (value, difficultySettings) => {
 
   const [oldTest, newTest] = [0, 473];
   let list = [];
@@ -31,7 +31,7 @@ export const numberGen = (value) => {
 
   function arrGen(){
 
-    for(let i = 0; i < 4; i++){
+    for(let i = 0; i < difficultySettings; i++){
 
       let randomNum = randomIntFromInterval(start_point, end_point)
 
