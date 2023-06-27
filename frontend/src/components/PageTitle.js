@@ -1,4 +1,4 @@
-import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField } from '@mui/material'
+import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField, Divider } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
@@ -6,20 +6,22 @@ import { localStorageData } from "../modules/localStorageData"
 
 export const PageTitle = () => {
 
-  const [active, setActive] = useState(0)
+  const [active, setActive] = useState(2)
+  const [active2, setActive2] = useState(0)
   const [choice, setChoice] = useState('')
-  const {difficulty, dispatch} = useTimeLineContext()
+  // const {difficulty, dispatch} = useTimeLineContext()
+  const [mode, setMode] = useState({level: 4, time: 40})
 
-  const setDifficulty = (value) => {
+  
+  
+  
+  const setCategory = () => {
 
-    setActive(value)
-
-    let dataPoint = {category: 'category', data: value}
-
+    let dataPoint = {category: 'category', data: active, diffMode: mode}
     let valueString = JSON.stringify(dataPoint)
-   
     localStorage.setItem('data', valueString)
   }
+
 
   const handleChange = (e) => {
     setChoice(e.target.value)
@@ -48,11 +50,11 @@ export const PageTitle = () => {
 
         <Stack justifyContent='center' spacing={2} sx={{marginTop: '120px', marginX: '14px'}}>
 
-          <Button variant='outlined' onClick={() => setDifficulty(1)}><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(1)}><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setDifficulty(2)} sx={{color: (active === 2? 'red': 'white')}}><Typography variant='body1'>New Testament</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(2)} sx={{color: (active === 2? 'red': 'white')}}><Typography variant='body1'>New Testament</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setDifficulty(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Mixed</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Mixed</Typography></Button>
 
           {/* <TextField
           variant='outlined'
@@ -72,6 +74,18 @@ export const PageTitle = () => {
          
         </Stack>
 
+        <Stack 
+        direction='row' 
+        justifyContent='center' 
+        marginTop={4}spacing={8}
+        >
+          <Button variant='outlined' onClick={() => setMode({level: 4, time:40})}><Typography variant='body1' sx={{color: (mode.level === 4? 'red': 'white')}}>Easy</Typography></Button>
+
+          <Button variant='outlined' onClick={() => setMode({level: 5, time:50})} sx={{color: (mode.level === 5? 'red': 'white')}}><Typography variant='body1'>Medium</Typography></Button>
+
+          <Button variant='outlined' onClick={() => setMode({level: 6, time:60})} sx={{color: (mode.level === 6? 'red': 'white')}}><Typography variant='body1'>Hard</Typography></Button>
+        </Stack>
+
 
         <Stack direction='row' justifyContent='center' spacing={2} sx={{marginTop: '40px'}}>
           {/* <Button variant='outlined' size='large'>Easy</Button>
@@ -79,7 +93,7 @@ export const PageTitle = () => {
           <Button variant='outlined' size='large'>Hard</Button> */}
           <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
            
-              <Typography variant='h4'>START</Typography>
+              <Button onClick={setCategory}><Typography variant='h4'>START</Typography></Button>
         
             </Link>
         </Stack>
