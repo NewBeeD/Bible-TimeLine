@@ -14,9 +14,8 @@ import Switch from '@mui/material/Switch';
 
 import ReactCountdownClock from 'react-countdown-clock'
 import CountDownTimer from "../components/CountDownTimer";
-
-
-
+import { useWindowSize } from "@uidotdev/usehooks";
+import breakPoint from "../modules/BreakPointCalculator";
 
 
 
@@ -46,7 +45,10 @@ export const Gamepage = () => {
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
   const [value, setValue] = useState(difficulty.diffMode);
   const [timer, setTimer] = useState(false)
- 
+  const [timeSize, setTimeSize] = useState(150)
+
+  const size = useWindowSize();
+  // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
 
   const handleChange = (event) => {
     setValue(parseInt(event.target.value, 10));
@@ -209,7 +211,7 @@ export const Gamepage = () => {
       </Drawer>
 
       
-      <Box display='flex' justifyContent='center' marginTop={10} marginBottom={1}>
+      <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:10, md:15, lg:25}} marginBottom={1}>
 
         {/* <Box>
           <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
@@ -219,7 +221,7 @@ export const Gamepage = () => {
             seconds={counter}
             color="#090"
             alpha={0.9}
-            size={150}
+            size={timeSize}
             onComplete={() => setBtnDisabled(true)}
             />   
 
@@ -232,7 +234,7 @@ export const Gamepage = () => {
 
       
 
-      <Container maxWidth='sm' sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '400px'}}>
+      <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
 
         <DragDropContext onDragEnd={handleDragDrop}>
 
@@ -254,7 +256,7 @@ export const Gamepage = () => {
                   <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
 
                     <ListItem sx={{textAlign: "center"}} >
-                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: '25px'}} />
+                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'18px', sm:'25px', md: '30px'}}} />
                     </ListItem>
 
                   </Paper>
@@ -277,7 +279,7 @@ export const Gamepage = () => {
 
       
 
-      <Stack display='flex' justifyContent='center' direction='row' spacing={16} sx={{marginTop: '0px'}}>
+      <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
           
           <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnDisabled}>Next</Button>
           <Button variant="outlined" color="secondary" onClick={eventSolution}>Solution</Button>
