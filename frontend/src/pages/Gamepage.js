@@ -256,7 +256,7 @@ export const Gamepage = () => {
                   <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
 
                     <ListItem sx={{textAlign: "center"}} >
-                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'18px', sm:'25px', md: '30px'}}} />
+                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
                     </ListItem>
 
                   </Paper>
