@@ -1,4 +1,4 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Radio, RadioGroup, FormControl, FormControlLabel, FormLabel } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
@@ -35,7 +35,10 @@ export const Gamepage = () => {
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
   const counterVal = useRef()
+  const [btnNxtDisabled, setBtnNxtDisabled] = useState(false)
+  const [btnSolDisabled, setBtnSolDisabled] = useState(false)
   const [btnDisabled, setBtnDisabled] = useState(false)
+
   const [score, setScore] = useState(0)
   const [showScore, setShowScore] = useState(true)
 
@@ -44,17 +47,24 @@ export const Gamepage = () => {
 
   const [counter, setCounter] = useState(difficulty.diffMode.time)
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
-  const [value, setValue] = useState(difficulty.diffMode);
+  const [value, setValue] = useState(0);
   const [timer, setTimer] = useState(false)
+  const [open, setOpen] = useState(true)
   // const [timeSize, setTimeSize] = useState(150)
 
   // const size = useWindowSize();
   // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
 
+
+
+
+  const closeDialogStartTimer = () => {
+    setOpen(false);
+  }
+
   const handleChange = (event) => {
     setValue(parseInt(event.target.value, 10));
     numberGen(difficulty.data, value)
-    
   };
   
   // random number added to the counter so as to render on every problem set
@@ -80,6 +90,13 @@ export const Gamepage = () => {
     let bool = orderChecker(eventsOrder, data)
 
     if(bool){
+
+      if(btnNxtDisabled && btnSolDisabled){
+
+        setBtnNxtDisabled(false)
+        setBtnSolDisabled(false)
+      }
+
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
       setScore((scr) => scr + 10)
@@ -131,197 +148,265 @@ export const Gamepage = () => {
     let solutionData = solution(eventsOrder, data) 
     setTruth('blue')
     setData(solutionData)
-    setTimeout(setBlue, 1500)
+    setTimeout(setBlue, 1000)
+
+    setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true)}, 1000);
+    
   }
 
   function setBlue(){
     setTruth('none')
   }
 
-  // useEffect(() => {
-
-  //   counterVal.current = setInterval(decreaseNum, 1000);
-  //   return () => clearInterval(counterVal.current);
-
-  // })
-
-
-  // const decreaseNum = () => {
-
-  //   if(counter > 0){
-  //     setCounter((prev) => prev - 1)
-  //   }
-  //   else{
-  //     // setCounter(0)
-  //     clearInterval(counterVal.current);
-  //     setBtnDisabled(true)
-  //   }};
-
 
   let order = eventsCheck(data)
 
- 
-  return (
 
-    <div minHeight="100vh" className="gamePage">
+  if(open){
+    return (
 
-      <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+      <div minHeight="100vh" className="gamePage">
 
-          <Box>
-
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={()=>setIsDrawerOpen(true)}
-            >
-                <MenuIcon />
-              </IconButton>
-
-          </Box>        
-
-
-          <Box >
-
-            <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
-
-          </Box>
-
-          <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
-
-            <Typography></Typography>
-            {/* <Switch color="secondary"/> */}
-          </Box>
-
-        </Toolbar>
-      </AppBar>
-
-      {/* Drawer */}
-      <Drawer anchor="left" 
-      open={isDrawerOPen}
-      onClose={() => setIsDrawerOpen(false)
-      }>
-
-        <Box p={2} width='250px' textAlign='center' justifyContent='center' role='presentation'>
-
-          <Typography variant="h4" style={{color: '#173174'}}> Settings </Typography>
-
-          <Box marginTop={10}>
+        <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
 
             <Box>
-              <Stack spacing={10} direction='row' alignItems='center' justifyContent='center' >
 
-                <Box>
-                  <Typography>Speedster</Typography>
-                </Box>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={()=>setIsDrawerOpen(true)}
+              >
+                  <MenuIcon />
+                </IconButton>
 
-                <Box>
-                  <Switch 
-                  checked={timer}
-                  onChange={timerChange}
-                  />              
-                </Box>
+            </Box>        
 
-              </Stack>
+
+            <Box >
+
+              <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
+
             </Box>
 
+            <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
+
+              <Typography></Typography>
+              {/* <Switch color="secondary"/> */}
+            </Box>
+
+          </Toolbar>
+        </AppBar>
+
+
+        <Dialog open={open} >
+
+          <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
+
+          <DialogContent>
+            <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
+            <DialogContentText>Click next if you are confident in your order of events.</DialogContentText>
+            <DialogContentText>If it shows red, that means your order is not, so try again.</DialogContentText>
+            <DialogContentText>If you are not able to solve, then click solution to see the right order of events.</DialogContentText>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>OK</Button>
+          </DialogActions>
+
+        </Dialog>
+
+      </div>
+    )
+  }
+  else{
+
+    return (
+
+      <div minHeight="100vh" className="gamePage">
+  
+        <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+  
             <Box>
-              <Typography marginTop={5} variant="body1" sx={{cursor: 'pointer'}}>ScoreBoard</Typography>
+  
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={()=>setIsDrawerOpen(true)}
+              >
+                  <MenuIcon />
+                </IconButton>
+  
+            </Box>        
+  
+  
+            <Box >
+  
+              <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
+  
             </Box>
-            
-
+  
+            <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
+  
+              <Typography></Typography>
+              {/* <Switch color="secondary"/> */}
+            </Box>
+  
+          </Toolbar>
+        </AppBar>
+  
+        {/* Drawer */}
+        <Drawer anchor="left" 
+        open={isDrawerOPen}
+        onClose={() => setIsDrawerOpen(false)
+        }>
+  
+          <Box p={2} width='250px' textAlign='center' justifyContent='center' role='presentation'>
+  
+            <Typography variant="h4" style={{color: '#173174'}}> Settings </Typography>
+  
+            <Box marginTop={10}>
+  
+              <Box>
+                <Stack spacing={10} direction='row' alignItems='center' justifyContent='center' >
+  
+                  <Box>
+                    <Typography>Speedster</Typography>
+                  </Box>
+  
+                  <Box>
+                    <Switch 
+                    checked={timer}
+                    onChange={timerChange}
+                    />              
+                  </Box>
+  
+                </Stack>
+              </Box>
+  
+              <Box>
+                <Typography marginTop={5} variant="body1" sx={{cursor: 'pointer'}}>ScoreBoard</Typography>
+              </Box>
+              
+  
+            </Box>
+  
           </Box>
-
+  
+        </Drawer>
+  
+        {/* CountDown Timer */}
+        <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:8, md:10, lg:12}} marginBottom={2}>
+  
+          {/* <Box>
+            <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+          </Box> */}
+  
+          <ReactCountdownClock 
+              seconds={counter}
+              color="#090"
+              alpha={0.9}
+              size={150}
+              onComplete={() => setBtnNxtDisabled(true)}
+              />   
+  
         </Box>
-
-      </Drawer>
-
-      {/* CountDown Timer */}
-      <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:8, md:10, lg:12}} marginBottom={1}>
-
-        {/* <Box>
-          <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+  
+        {/* <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
+  
+          {showScore && 
+          <Box sx={{textAlign: 'center'}}>
+  
+            <Typography variant="h3" style={{color: '#090'}}>{ score }</Typography>
+            
+          </Box>}
+  
         </Box> */}
-
-        <ReactCountdownClock 
-            seconds={counter}
-            color="#090"
-            alpha={0.9}
-            size={150}
-            onComplete={() => setBtnDisabled(true)}
-            />   
-
-      </Box>
-
-      <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
-
-        {showScore && 
-        <Box sx={{textAlign: 'center'}}>
-
-          <Typography variant="h3" style={{color: '#090'}}>{ score }</Typography>
-          
-        </Box>}
-
-      </Box>
-
-      
-
-      <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
-
-        <DragDropContext onDragEnd={handleDragDrop}>
-
-          <Droppable droppableId="list">
-
-            {(provided) => (
-
-              <List 
-              {...provided.droppableProps} 
-              ref={provided.innerRef} 
-              sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
-
-              {data && data.map((points, index)=> (
-                
-                <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
-
-                {(provided) => (
-
-                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
-
-                    <ListItem sx={{textAlign: "center"}} >
-                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
-                    </ListItem>
-
-                  </Paper>
-
-                )}
-
-              </Draggable>
-              ))}
-
-              {provided.placeholder}
-
-
-            </List>
-            )}
+  
         
-          </Droppable>
-        </DragDropContext>
-
-      </Container>
-
-      
-
-      <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+  
+        <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+  
+          <DragDropContext onDragEnd={handleDragDrop}>
+  
+            <Droppable droppableId="list">
+  
+              {(provided) => (
+  
+                <List 
+                {...provided.droppableProps} 
+                ref={provided.innerRef} 
+                sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
+  
+                {data && data.map((points, index)=> (
+                  
+                  <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+  
+                  {(provided) => (
+  
+                    <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+  
+                      <ListItem sx={{textAlign: "center"}} >
+                        <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
+                      </ListItem>
+  
+                    </Paper>
+  
+                  )}
+  
+                </Draggable>
+                ))}
+  
+                {provided.placeholder}
+  
+  
+              </List>
+              )}
           
-          <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnDisabled}>Next</Button>
-          <Button variant="outlined" color="secondary" onClick={eventSolution}>Solution</Button>
-      </Stack>
+            </Droppable>
+          </DragDropContext>
+  
+        </Container>
+
+        {!btnSolDisabled && 
+        
+        <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+            
+            <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled}>Next</Button>
+            <Button variant="outlined" color="secondary" onClick={eventSolution} disabled={btnSolDisabled}>Solution</Button>
+        </Stack>}
+
+        {btnSolDisabled && 
+
+          <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+
+            <Button 
+            variant="outlined" 
+            size="large" 
+            color="secondary" 
+            onClick={nextSet} 
+            >
+              Try Again
+            </Button>
+
+          </Stack>
+        }
+  
+        
+  
+        
+  
+  
+      </div>
+    )
 
 
-    </div>
-  )
+  }
 }
 
 
