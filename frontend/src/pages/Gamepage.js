@@ -12,10 +12,11 @@ import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
 import Switch from '@mui/material/Switch';
 
+
 import ReactCountdownClock from 'react-countdown-clock'
 import CountDownTimer from "../components/CountDownTimer";
-import { useWindowSize } from "@uidotdev/usehooks";
-import breakPoint from "../modules/BreakPointCalculator";
+// import { useWindowSize } from "@uidotdev/usehooks";
+// import breakPoint from "../modules/BreakPointCalculator";
 
 
 
@@ -36,7 +37,7 @@ export const Gamepage = () => {
   const counterVal = useRef()
   const [btnDisabled, setBtnDisabled] = useState(false)
   const [score, setScore] = useState(0)
-  const [showScore, setShowScore] = useState(false)
+  const [showScore, setShowScore] = useState(true)
 
   // const [countdown, setCountDown] = useState(() => <CountDownTimer />)
   
@@ -45,9 +46,9 @@ export const Gamepage = () => {
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
   const [value, setValue] = useState(difficulty.diffMode);
   const [timer, setTimer] = useState(false)
-  const [timeSize, setTimeSize] = useState(150)
+  // const [timeSize, setTimeSize] = useState(150)
 
-  const size = useWindowSize();
+  // const size = useWindowSize();
   // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
 
   const handleChange = (event) => {
@@ -164,7 +165,7 @@ export const Gamepage = () => {
 
     <div minHeight="100vh" className="gamePage">
 
-      <AppBar position="static" >
+      <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
 
           <Box>
@@ -184,7 +185,7 @@ export const Gamepage = () => {
 
           <Box >
 
-            <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center'}}><Link to='/' style={{textDecoration: 'none'}}>Bible TimeLine</Link></Typography></Button>
+            <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
 
           </Box>
 
@@ -197,6 +198,7 @@ export const Gamepage = () => {
         </Toolbar>
       </AppBar>
 
+      {/* Drawer */}
       <Drawer anchor="left" 
       open={isDrawerOPen}
       onClose={() => setIsDrawerOpen(false)
@@ -204,14 +206,40 @@ export const Gamepage = () => {
 
         <Box p={2} width='250px' textAlign='center' justifyContent='center' role='presentation'>
 
-          
+          <Typography variant="h4" style={{color: '#173174'}}> Settings </Typography>
+
+          <Box marginTop={10}>
+
+            <Box>
+              <Stack spacing={10} direction='row' alignItems='center' justifyContent='center' >
+
+                <Box>
+                  <Typography>Speedster</Typography>
+                </Box>
+
+                <Box>
+                  <Switch 
+                  checked={timer}
+                  onChange={timerChange}
+                  />              
+                </Box>
+
+              </Stack>
+            </Box>
+
+            <Box>
+              <Typography marginTop={5} variant="body1" sx={{cursor: 'pointer'}}>ScoreBoard</Typography>
+            </Box>
+            
+
+          </Box>
 
         </Box>
 
       </Drawer>
 
-      
-      <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:10, md:15, lg:25}} marginBottom={1}>
+      {/* CountDown Timer */}
+      <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:8, md:10, lg:12}} marginBottom={1}>
 
         {/* <Box>
           <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
@@ -221,13 +249,19 @@ export const Gamepage = () => {
             seconds={counter}
             color="#090"
             alpha={0.9}
-            size={timeSize}
+            size={150}
             onComplete={() => setBtnDisabled(true)}
             />   
 
+      </Box>
 
-        {showScore && <Box display='flex' alignContent='center' marginLeft={10} color='red' sx={{backgroundColor: 'black', paddingX: '10px'}}>
-          <Typography variant="h3">{ score }</Typography>
+      <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
+
+        {showScore && 
+        <Box sx={{textAlign: 'center'}}>
+
+          <Typography variant="h3" style={{color: '#090'}}>{ score }</Typography>
+          
         </Box>}
 
       </Box>
