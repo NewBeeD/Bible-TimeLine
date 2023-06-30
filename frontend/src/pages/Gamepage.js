@@ -165,7 +165,7 @@ export const Gamepage = () => {
     setData(solutionData)
     setTimeout(setBlue, 1000)
     
-    setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true)}, 1000);
+    setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true); setBlankTimer(true)}, 1000);
     
   }
 
