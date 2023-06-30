@@ -61,7 +61,7 @@ export const Gamepage = () => {
 
     let gameMode = difficulty.diffMode.level
 
-    if(parseInt(gameMode, 10) === moveCounter){
+    if(moveCounter > parseInt(gameMode, 10)){
       setBtnNxtDisabled(true) 
       setBlankTimer(true)
       setMoveCounter(1)}
@@ -109,6 +109,8 @@ export const Gamepage = () => {
         setBtnSolDisabled(false)
         setBlankTimer(false)
       }
+
+      setMoveCounter(1)
 
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
