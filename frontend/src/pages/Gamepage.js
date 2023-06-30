@@ -1,4 +1,4 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
@@ -167,7 +167,7 @@ export const Gamepage = () => {
 
       <div minHeight="100vh" className="gamePage">
 
-        <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#173174', marginBottom: {xs: '185px', sm: '150px', md: '100px', lg: '200px'} }}>
           <Toolbar sx={{ justifyContent: "space-between" }}>
 
             <Box>
@@ -207,9 +207,13 @@ export const Gamepage = () => {
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
             <DialogContentText>Click next if you are confident in your order of events.</DialogContentText>
-            <DialogContentText>If it shows red, that means your order is not, so try again.</DialogContentText>
-            <DialogContentText>If you are not able to solve, then click solution to see the right order of events.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If it shows red, that means your order is not correct, so try again.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If you are unable to solve, then click solution to see the answer.</DialogContentText>
+
           </DialogContent>
 
           <DialogActions>
@@ -217,6 +221,51 @@ export const Gamepage = () => {
           </DialogActions>
 
         </Dialog>
+
+        
+
+        <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+  
+  <DragDropContext onDragEnd={handleDragDrop}>
+
+    <Droppable droppableId="list">
+
+      {(provided) => (
+
+        <List 
+        {...provided.droppableProps} 
+        ref={provided.innerRef} 
+        sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
+
+        {data && data.map((points, index)=> (
+          
+          <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+
+          {(provided) => (
+
+            <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+
+              <ListItem sx={{textAlign: "center"}} >
+                <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
+              </ListItem>
+
+            </Paper>
+
+          )}
+
+        </Draggable>
+        ))}
+
+        {provided.placeholder}
+
+
+      </List>
+      )}
+  
+    </Droppable>
+  </DragDropContext>
+
+        </Container>
 
       </div>
     )
