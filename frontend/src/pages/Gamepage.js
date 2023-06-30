@@ -50,12 +50,24 @@ export const Gamepage = () => {
   const [value, setValue] = useState(0);
   const [timer, setTimer] = useState(false)
   const [open, setOpen] = useState(true)
+  const [moveCounter, setMoveCounter] = useState(1)
+  const [blankTimer, setBlankTimer] = useState(false)
   // const [timeSize, setTimeSize] = useState(150)
 
   // const size = useWindowSize();
   // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
 
+  const moveCounterFunction = () =>{
 
+    let gameMode = difficulty.diffMode.level
+
+    if(parseInt(gameMode, 10) === moveCounter){
+      setBtnNxtDisabled(true) 
+      setBlankTimer(true)
+      setMoveCounter(1)}
+  }
+
+  
 
 
   const closeDialogStartTimer = () => {
@@ -95,6 +107,7 @@ export const Gamepage = () => {
 
         setBtnNxtDisabled(false)
         setBtnSolDisabled(false)
+        setBlankTimer(false)
       }
 
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
@@ -126,6 +139,7 @@ export const Gamepage = () => {
 
     setTruth('none')
     setAnimation(false)
+    setMoveCounter(() => moveCounter + 1)
 
     if(!result.destination){return}
 
@@ -134,6 +148,7 @@ export const Gamepage = () => {
     items.splice(result.destination.index, 0, reorderedItem)
 
     setData(items)
+    moveCounterFunction()
   }
 
   // Removing Gamemode from local-storage 
@@ -149,7 +164,7 @@ export const Gamepage = () => {
     setTruth('blue')
     setData(solutionData)
     setTimeout(setBlue, 1000)
-
+    
     setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true)}, 1000);
     
   }
@@ -157,6 +172,9 @@ export const Gamepage = () => {
   function setBlue(){
     setTruth('none')
   }
+
+
+
 
 
   let order = eventsCheck(data)
@@ -204,6 +222,7 @@ export const Gamepage = () => {
         <Dialog open={open} >
 
           <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
+          <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} tries</Typography></DialogTitle>
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
@@ -222,8 +241,7 @@ export const Gamepage = () => {
 
         </Dialog>
 
-        
-
+      
         <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
   
   <DragDropContext onDragEnd={handleDragDrop}>
@@ -355,14 +373,29 @@ export const Gamepage = () => {
           {/* <Box>
             <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
           </Box> */}
-  
-          <ReactCountdownClock 
+
+        {!blankTimer? <ReactCountdownClock 
+                      seconds={counter}
+                      color="#090"
+                      alpha={0.9}
+                      size={150}
+                      onComplete={() => setBtnNxtDisabled(true)}
+                      /> : <ReactCountdownClock 
+                      seconds={0}
+                      color="#090"
+                      alpha={0.9}
+                      size={150}
+                      /> }
+
+          
+
+          {/* <ReactCountdownClock 
               seconds={counter}
               color="#090"
               alpha={0.9}
               size={150}
               onComplete={() => setBtnNxtDisabled(true)}
-              />   
+              />    */}
   
         </Box>
   
