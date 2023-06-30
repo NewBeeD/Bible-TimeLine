@@ -1,4 +1,4 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Radio, RadioGroup, FormControl, FormControlLabel, FormLabel } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
@@ -12,10 +12,11 @@ import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
 import Switch from '@mui/material/Switch';
 
+
 import ReactCountdownClock from 'react-countdown-clock'
 import CountDownTimer from "../components/CountDownTimer";
-import { useWindowSize } from "@uidotdev/usehooks";
-import breakPoint from "../modules/BreakPointCalculator";
+// import { useWindowSize } from "@uidotdev/usehooks";
+// import breakPoint from "../modules/BreakPointCalculator";
 
 
 
@@ -34,26 +35,36 @@ export const Gamepage = () => {
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
   const counterVal = useRef()
+  const [btnNxtDisabled, setBtnNxtDisabled] = useState(false)
+  const [btnSolDisabled, setBtnSolDisabled] = useState(false)
   const [btnDisabled, setBtnDisabled] = useState(false)
+
   const [score, setScore] = useState(0)
-  const [showScore, setShowScore] = useState(false)
+  const [showScore, setShowScore] = useState(true)
 
   // const [countdown, setCountDown] = useState(() => <CountDownTimer />)
   
 
   const [counter, setCounter] = useState(difficulty.diffMode.time)
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
-  const [value, setValue] = useState(difficulty.diffMode);
+  const [value, setValue] = useState(0);
   const [timer, setTimer] = useState(false)
-  const [timeSize, setTimeSize] = useState(150)
+  const [open, setOpen] = useState(true)
+  // const [timeSize, setTimeSize] = useState(150)
 
-  const size = useWindowSize();
+  // const size = useWindowSize();
   // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
+
+
+
+
+  const closeDialogStartTimer = () => {
+    setOpen(false);
+  }
 
   const handleChange = (event) => {
     setValue(parseInt(event.target.value, 10));
     numberGen(difficulty.data, value)
-    
   };
   
   // random number added to the counter so as to render on every problem set
@@ -79,6 +90,13 @@ export const Gamepage = () => {
     let bool = orderChecker(eventsOrder, data)
 
     if(bool){
+
+      if(btnNxtDisabled && btnSolDisabled){
+
+        setBtnNxtDisabled(false)
+        setBtnSolDisabled(false)
+      }
+
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
       setScore((scr) => scr + 10)
@@ -130,164 +148,314 @@ export const Gamepage = () => {
     let solutionData = solution(eventsOrder, data) 
     setTruth('blue')
     setData(solutionData)
-    setTimeout(setBlue, 1500)
+    setTimeout(setBlue, 1000)
+
+    setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true)}, 1000);
+    
   }
 
   function setBlue(){
     setTruth('none')
   }
 
-  // useEffect(() => {
-
-  //   counterVal.current = setInterval(decreaseNum, 1000);
-  //   return () => clearInterval(counterVal.current);
-
-  // })
-
-
-  // const decreaseNum = () => {
-
-  //   if(counter > 0){
-  //     setCounter((prev) => prev - 1)
-  //   }
-  //   else{
-  //     // setCounter(0)
-  //     clearInterval(counterVal.current);
-  //     setBtnDisabled(true)
-  //   }};
-
 
   let order = eventsCheck(data)
 
- 
-  return (
 
-    <div minHeight="100vh" className="gamePage">
+  if(open){
+    return (
 
-      <AppBar position="static" >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+      <div minHeight="100vh" className="gamePage">
 
-          <Box>
+        <AppBar position="static" sx={{ backgroundColor: '#173174', marginBottom: {xs: '185px', sm: '150px', md: '100px', lg: '200px'} }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
 
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={()=>setIsDrawerOpen(true)}
-            >
-                <MenuIcon />
-              </IconButton>
+            <Box>
 
-          </Box>        
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={()=>setIsDrawerOpen(true)}
+              >
+                  <MenuIcon />
+                </IconButton>
 
-
-          <Box >
-
-            <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center'}}><Link to='/' style={{textDecoration: 'none'}}>Bible TimeLine</Link></Typography></Button>
-
-          </Box>
-
-          <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
-
-            <Typography></Typography>
-            {/* <Switch color="secondary"/> */}
-          </Box>
-
-        </Toolbar>
-      </AppBar>
-
-      <Drawer anchor="left" 
-      open={isDrawerOPen}
-      onClose={() => setIsDrawerOpen(false)
-      }>
-
-        <Box p={2} width='250px' textAlign='center' justifyContent='center' role='presentation'>
-
-          
-
-        </Box>
-
-      </Drawer>
-
-      
-      <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:10, md:15, lg:25}} marginBottom={1}>
-
-        {/* <Box>
-          <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
-        </Box> */}
-
-        <ReactCountdownClock 
-            seconds={counter}
-            color="#090"
-            alpha={0.9}
-            size={timeSize}
-            onComplete={() => setBtnDisabled(true)}
-            />   
+            </Box>        
 
 
-        {showScore && <Box display='flex' alignContent='center' marginLeft={10} color='red' sx={{backgroundColor: 'black', paddingX: '10px'}}>
-          <Typography variant="h3">{ score }</Typography>
-        </Box>}
+            <Box >
 
-      </Box>
+              <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
 
-      
+            </Box>
 
-      <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+            <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
 
-        <DragDropContext onDragEnd={handleDragDrop}>
+              <Typography></Typography>
+              {/* <Switch color="secondary"/> */}
+            </Box>
 
-          <Droppable droppableId="list">
-
-            {(provided) => (
-
-              <List 
-              {...provided.droppableProps} 
-              ref={provided.innerRef} 
-              sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
-
-              {data && data.map((points, index)=> (
-                
-                <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
-
-                {(provided) => (
-
-                  <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
-
-                    <ListItem sx={{textAlign: "center"}} >
-                      <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
-                    </ListItem>
-
-                  </Paper>
-
-                )}
-
-              </Draggable>
-              ))}
-
-              {provided.placeholder}
+          </Toolbar>
+        </AppBar>
 
 
-            </List>
-            )}
+        <Dialog open={open} >
+
+          <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
+
+          <DialogContent>
+            <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>Click next if you are confident in your order of events.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If it shows red, that means your order is not correct, so try again.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If you are unable to solve, then click solution to see the answer.</DialogContentText>
+
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>OK</Button>
+          </DialogActions>
+
+        </Dialog>
+
         
-          </Droppable>
-        </DragDropContext>
 
-      </Container>
+        <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+  
+  <DragDropContext onDragEnd={handleDragDrop}>
 
-      
+    <Droppable droppableId="list">
 
-      <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+      {(provided) => (
+
+        <List 
+        {...provided.droppableProps} 
+        ref={provided.innerRef} 
+        sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
+
+        {data && data.map((points, index)=> (
           
-          <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnDisabled}>Next</Button>
-          <Button variant="outlined" color="secondary" onClick={eventSolution}>Solution</Button>
-      </Stack>
+          <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+
+          {(provided) => (
+
+            <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+
+              <ListItem sx={{textAlign: "center"}} >
+                <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
+              </ListItem>
+
+            </Paper>
+
+          )}
+
+        </Draggable>
+        ))}
+
+        {provided.placeholder}
 
 
-    </div>
-  )
+      </List>
+      )}
+  
+    </Droppable>
+  </DragDropContext>
+
+        </Container>
+
+      </div>
+    )
+  }
+  else{
+
+    return (
+
+      <div minHeight="100vh" className="gamePage">
+  
+        <AppBar position="static" sx={{ backgroundColor: '#173174' }}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+  
+            <Box>
+  
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={()=>setIsDrawerOpen(true)}
+              >
+                  <MenuIcon />
+                </IconButton>
+  
+            </Box>        
+  
+  
+            <Box >
+  
+              <Button onClick={changeCategory}><Typography variant="h5" sx={{alignItems: 'center', color: 'white'}}><Link to='/' style={{textDecoration: 'none', color: 'white'}}>Bible TimeLine</Link></Typography></Button>
+  
+            </Box>
+  
+            <Box direction="row" spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
+  
+              <Typography></Typography>
+              {/* <Switch color="secondary"/> */}
+            </Box>
+  
+          </Toolbar>
+        </AppBar>
+  
+        {/* Drawer */}
+        <Drawer anchor="left" 
+        open={isDrawerOPen}
+        onClose={() => setIsDrawerOpen(false)
+        }>
+  
+          <Box p={2} width='250px' textAlign='center' justifyContent='center' role='presentation'>
+  
+            <Typography variant="h4" style={{color: '#173174'}}> Settings </Typography>
+  
+            <Box marginTop={10}>
+  
+              <Box>
+                <Stack spacing={10} direction='row' alignItems='center' justifyContent='center' >
+  
+                  <Box>
+                    <Typography>Speedster</Typography>
+                  </Box>
+  
+                  <Box>
+                    <Switch 
+                    checked={timer}
+                    onChange={timerChange}
+                    />              
+                  </Box>
+  
+                </Stack>
+              </Box>
+  
+              <Box>
+                <Typography marginTop={5} variant="body1" sx={{cursor: 'pointer'}}>ScoreBoard</Typography>
+              </Box>
+              
+  
+            </Box>
+  
+          </Box>
+  
+        </Drawer>
+  
+        {/* CountDown Timer */}
+        <Box display='flex' justifyContent='center' marginTop={{xs:5, sm:8, md:10, lg:12}} marginBottom={2}>
+  
+          {/* <Box>
+            <Typography variant="h3">00:{counter < 10? `0${counter}`: counter}</Typography>
+          </Box> */}
+  
+          <ReactCountdownClock 
+              seconds={counter}
+              color="#090"
+              alpha={0.9}
+              size={150}
+              onComplete={() => setBtnNxtDisabled(true)}
+              />   
+  
+        </Box>
+  
+        {/* <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
+  
+          {showScore && 
+          <Box sx={{textAlign: 'center'}}>
+  
+            <Typography variant="h3" style={{color: '#090'}}>{ score }</Typography>
+            
+          </Box>}
+  
+        </Box> */}
+  
+        
+  
+        <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+  
+          <DragDropContext onDragEnd={handleDragDrop}>
+  
+            <Droppable droppableId="list">
+  
+              {(provided) => (
+  
+                <List 
+                {...provided.droppableProps} 
+                ref={provided.innerRef} 
+                sx={{width: '100%', maxWidth: 560, bgcolor: 'background.paper', textAlign: 'center'}}>
+  
+                {data && data.map((points, index)=> (
+                  
+                  <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+  
+                  {(provided) => (
+  
+                    <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+  
+                      <ListItem sx={{textAlign: "center"}} >
+                        <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
+                      </ListItem>
+  
+                    </Paper>
+  
+                  )}
+  
+                </Draggable>
+                ))}
+  
+                {provided.placeholder}
+  
+  
+              </List>
+              )}
+          
+            </Droppable>
+          </DragDropContext>
+  
+        </Container>
+
+        {!btnSolDisabled && 
+        
+        <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+            
+            <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled}>Next</Button>
+            <Button variant="outlined" color="secondary" onClick={eventSolution} disabled={btnSolDisabled}>Solution</Button>
+        </Stack>}
+
+        {btnSolDisabled && 
+
+          <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
+
+            <Button 
+            variant="outlined" 
+            size="large" 
+            color="secondary" 
+            onClick={nextSet} 
+            >
+              Try Again
+            </Button>
+
+          </Stack>
+        }
+  
+        
+  
+        
+  
+  
+      </div>
+    )
+
+
+  }
 }
 
 
