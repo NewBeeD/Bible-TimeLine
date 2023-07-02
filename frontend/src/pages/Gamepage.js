@@ -166,8 +166,9 @@ export const Gamepage = () => {
     setTruth('blue')
     setData(solutionData)
     setTimeout(setBlue, 1000)
+    setBtnNxtDisabled(true)
     
-    setTimeout(() => {setBtnSolDisabled(true); setBtnNxtDisabled(true); setBlankTimer(true)}, 1000);
+    setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 1000);
     
   }
 
@@ -224,7 +225,7 @@ export const Gamepage = () => {
         <Dialog open={open} >
 
           <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
-          <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} tries</Typography></DialogTitle>
+          <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
