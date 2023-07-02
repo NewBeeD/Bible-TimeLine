@@ -108,13 +108,17 @@ export const Gamepage = () => {
         setBtnNxtDisabled(false)
         setBtnSolDisabled(false)
         setBlankTimer(false)
+        setScore(0)
+      }
+      else{
+        setScore((scr) => scr + 1)
       }
 
       setMoveCounter(1)
 
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
-      setScore((scr) => scr + 10)
+      
       
       switch(difficulty.diffMode.level){
 
@@ -167,6 +171,7 @@ export const Gamepage = () => {
     setData(solutionData)
     setTimeout(setBlue, 1000)
     setBtnNxtDisabled(true)
+    setScore(0)
     
     setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 1000);
     
@@ -390,19 +395,10 @@ export const Gamepage = () => {
                       size={150}
                       /> }
 
-          
-
-          {/* <ReactCountdownClock 
-              seconds={counter}
-              color="#090"
-              alpha={0.9}
-              size={150}
-              onComplete={() => setBtnNxtDisabled(true)}
-              />    */}
   
         </Box>
   
-        {/* <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
+        {showScore && <Box margin='auto' marginY={2} sx={{textAlign: 'center', border: '2px solid #173174', width: '120px', borderRadius: '10px'}}>
   
           {showScore && 
           <Box sx={{textAlign: 'center'}}>
@@ -411,7 +407,7 @@ export const Gamepage = () => {
             
           </Box>}
   
-        </Box> */}
+        </Box>}
   
         
   
