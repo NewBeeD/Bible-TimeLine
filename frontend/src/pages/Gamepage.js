@@ -1,4 +1,4 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider } from "@mui/material"
+import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider, Switch } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
@@ -10,7 +10,8 @@ import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
-import Switch from '@mui/material/Switch';
+import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "../modules/tempCookie";
+
 
 
 import ReactCountdownClock from 'react-countdown-clock'
@@ -29,7 +30,6 @@ export const Gamepage = () => {
 
   const difficulty = JSON.parse(localStorage.getItem('data'));
 
-
  
   const [data, setData] = useState(numberGen(difficulty.data, difficulty.diffMode.level))
   const [truth, setTruth] = useState('')
@@ -44,7 +44,6 @@ export const Gamepage = () => {
 
   // const [countdown, setCountDown] = useState(() => <CountDownTimer />)
   
-
   const [counter, setCounter] = useState(difficulty.diffMode.time)
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
   const [value, setValue] = useState(0);
@@ -52,16 +51,22 @@ export const Gamepage = () => {
   const [open, setOpen] = useState(true)
   const [moveCounter, setMoveCounter] = useState(1)
   const [blankTimer, setBlankTimer] = useState(false)
-  // const [timeSize, setTimeSize] = useState(150)
+  const [modal, setModal] = useState(true)
 
-  // const size = useWindowSize();
-  // const timerSizeCal = setTimeSize(breakPoint(size.width)) 
 
   const moveCounterFunction = () =>{
 
     let gameMode = difficulty.diffMode.level
 
     if(moveCounter > parseInt(gameMode, 10)){
+
+      if(modal === true){
+        firstCookie(difficulty, score)
+      }
+      else{
+        updateCookie(difficulty, score)
+      }
+      
       setBtnNxtDisabled(true) 
       setBlankTimer(true)
       setMoveCounter(1)}
@@ -123,15 +128,15 @@ export const Gamepage = () => {
       switch(difficulty.diffMode.level){
 
         case 4:
-          setCounter(40 + randomNum(timer))
+          setCounter(30 + randomNum(timer))
           break;
         
         case 5:
-          setCounter(50 + randomNum(timer))
+          setCounter(40 + randomNum(timer))
           break;
 
         case 6:
-          setCounter(60 + randomNum(timer))
+          setCounter(50 + randomNum(timer))
           break;
       }
     }
@@ -168,10 +173,20 @@ export const Gamepage = () => {
 
     let solutionData = solution(eventsOrder, data) 
     setTruth('blue')
+
+
+    if(modal === true){
+      firstCookie(difficulty, score)
+    }
+    else{
+      updateCookie(difficulty, score)
+    }
+    
     setData(solutionData)
     setTimeout(setBlue, 1000)
     setBtnNxtDisabled(true)
     setScore(0)
+    
     
     setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 1000);
     
@@ -181,9 +196,32 @@ export const Gamepage = () => {
     setTruth('none')
   }
 
+  
+  // Setting up temporary highscore data storage
+  useEffect(() => {
 
+    let data;
 
+    if(document.cookie){
+      setModal(false)
+      setOpen(false)
+    }
+  }, [])
 
+  const cookieFunction = () => {
+
+    setBtnNxtDisabled(true)
+
+    if(modal === true){
+      firstCookie(difficulty, score)
+    }
+    else{
+      updateCookie(difficulty, score)
+    }
+    
+  }
+
+  getCookie('bibleTimeLine')
 
   let order = eventsCheck(data)
 
@@ -227,7 +265,7 @@ export const Gamepage = () => {
         </AppBar>
 
 
-        <Dialog open={open} >
+        {modal && <Dialog open={open} >
 
           <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
           <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
@@ -247,7 +285,7 @@ export const Gamepage = () => {
             <Button onClick={() => setOpen(false)}>OK</Button>
           </DialogActions>
 
-        </Dialog>
+        </Dialog>}
 
       
         <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
@@ -387,7 +425,7 @@ export const Gamepage = () => {
                       color="#090"
                       alpha={0.9}
                       size={150}
-                      onComplete={() => setBtnNxtDisabled(true)}
+                      onComplete={cookieFunction}
                       /> : <ReactCountdownClock 
                       seconds={0}
                       color="#090"

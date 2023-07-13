@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { localStorageData } from "../modules/localStorageData"
 
+
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
   const [active2, setActive2] = useState(0)
   const [choice, setChoice] = useState('')
   // const {difficulty, dispatch} = useTimeLineContext()
-  const [mode, setMode] = useState({level: 4, time: 40})
+  const [mode, setMode] = useState({level: 4, time: 30})
 
   
   
@@ -79,11 +80,11 @@ export const PageTitle = () => {
         justifyContent='center' 
         marginTop={4}spacing={8}
         >
-          <Button variant='outlined' onClick={() => setMode({level: 4, time:40})}><Typography variant='body1' sx={{color: (mode.level === 4? 'red': 'white')}}>Easy</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 4, time:30})}><Typography variant='body1' sx={{color: (mode.level === 4? 'red': 'white')}}>Easy</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setMode({level: 5, time:50})} sx={{color: (mode.level === 5? 'red': 'white')}}><Typography variant='body1'>Medium</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 5, time:40})} sx={{color: (mode.level === 5? 'red': 'white')}}><Typography variant='body1'>Medium</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setMode({level: 6, time:60})} sx={{color: (mode.level === 6? 'red': 'white')}}><Typography variant='body1'>Hard</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 6, time:50})} sx={{color: (mode.level === 6? 'red': 'white')}}><Typography variant='body1'>Hard</Typography></Button>
         </Stack>
 
 
