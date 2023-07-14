@@ -94,7 +94,7 @@ export const PageTitle = () => {
           <Button variant='outlined' size='large'>Hard</Button> */}
           <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
            
-              <Button onClick={setCategory}><Typography variant='h4'>START</Typography></Button>
+              <Button onClick={setCategory}><Typography variant='h4' color='error'>START</Typography></Button>
         
             </Link>
         </Stack>

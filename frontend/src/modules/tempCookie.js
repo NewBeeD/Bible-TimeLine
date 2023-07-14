@@ -112,7 +112,6 @@ export const firstCookie = (difficulty, score) => {
 export const getCookie = (name) => {
 
   const hello = JSON.parse(Cookie.get(name)) 
-  console.log(hello);
 }
 
 export const updateCookie = (difficulty, score) => {

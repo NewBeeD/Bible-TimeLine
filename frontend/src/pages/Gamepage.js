@@ -221,8 +221,6 @@ export const Gamepage = () => {
     
   }
 
-  getCookie('bibleTimeLine')
-
   let order = eventsCheck(data)
 
 
