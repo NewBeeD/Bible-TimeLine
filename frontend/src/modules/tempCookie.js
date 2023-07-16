@@ -109,9 +109,12 @@ export const firstCookie = (difficulty, score) => {
 }
 
 
-export const getCookie = (name) => {
+export const getCookie = () => {
 
-  const hello = JSON.parse(Cookie.get(name)) 
+  const cookieName = 'bibleTimeLine'
+  const cookieData = JSON.parse(Cookie.get(cookieName)) 
+  return cookieData;
+
 }
 
 export const updateCookie = (difficulty, score) => {

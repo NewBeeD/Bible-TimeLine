@@ -1,8 +1,10 @@
 import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField, Divider } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
 import { localStorageData } from "../modules/localStorageData"
+import { FindHighScore } from '../modules/FindHighScore'
 
 
 export const PageTitle = () => {
@@ -12,6 +14,7 @@ export const PageTitle = () => {
   const [choice, setChoice] = useState('')
   // const {difficulty, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
+  const [highScore, setHighScore] = useState()
 
   
   
@@ -27,6 +30,12 @@ export const PageTitle = () => {
   const handleChange = (e) => {
     setChoice(e.target.value)
   }
+
+
+  useEffect(()=>{
+
+    setHighScore(FindHighScore(active, mode))
+  }, [active, mode])
  
   
   return (
@@ -49,7 +58,11 @@ export const PageTitle = () => {
           </Typography>
         </Box>
 
-        <Stack justifyContent='center' spacing={2} sx={{marginTop: '120px', marginX: '14px'}}>
+        {/* Highscore display for each mode click */}
+
+        <HighscoreDisplay highscore={highScore}/>
+
+        <Stack justifyContent='center' spacing={2} sx={{marginTop: '60px', marginX: '14px'}}>
 
           <Button variant='outlined' onClick={() => setActive(1)}><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
 

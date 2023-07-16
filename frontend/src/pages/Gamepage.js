@@ -94,7 +94,7 @@ export const Gamepage = () => {
   const timerChange = (event) => {
     setTimer(event.target.checked);
   }
-
+  
 
   let newList = [];
 
