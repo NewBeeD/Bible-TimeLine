@@ -11,6 +11,7 @@ import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
 import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "../modules/tempCookie";
+import { MoveCounterIcon } from "../components/MoveCounterIcon";
 
 
 
@@ -55,6 +56,8 @@ export const Gamepage = () => {
 
 
   const moveCounterFunction = () =>{
+
+    console.log('did i run?');
 
     let gameMode = difficulty.diffMode.level
 
@@ -148,9 +151,12 @@ export const Gamepage = () => {
   // Drag and Drop Functionality
   const handleDragDrop = (result) => {
 
+
+    const {source, destination, type, index} = result
+
     setTruth('none')
     setAnimation(false)
-    setMoveCounter(() => moveCounter + 1)
+    
 
     if(!result.destination){return}
 
@@ -158,8 +164,12 @@ export const Gamepage = () => {
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
 
-    setData(items)
-    moveCounterFunction()
+    
+    if(source.draggableId !== destination.droppableId && source.index !== destination.index){
+      setMoveCounter(() => moveCounter + 1)
+      setData(items)
+      moveCounterFunction()}
+    // moveCounterFunction()
   }
 
   // Removing Gamemode from local-storage 
@@ -420,7 +430,7 @@ export const Gamepage = () => {
 
         {!blankTimer? <ReactCountdownClock 
                       seconds={counter}
-                      color="#090"
+                      color="#173174"
                       alpha={0.9}
                       size={150}
                       onComplete={cookieFunction}
@@ -439,7 +449,7 @@ export const Gamepage = () => {
           {showScore && 
           <Box sx={{textAlign: 'center'}}>
   
-            <Typography variant="h3" style={{color: '#090'}}>{ score }</Typography>
+            <Typography variant="h3" style={{color: '#173174'}}>{ score }</Typography>
             
           </Box>}
   
@@ -494,7 +504,7 @@ export const Gamepage = () => {
         
         <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
             
-            <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled}>Next</Button>
+            <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled} startIcon={<MoveCounterIcon moveCounter={moveCounter} level={difficulty.diffMode.level}/>}>Next</Button>
             <Button variant="outlined" color="secondary" onClick={eventSolution} disabled={btnSolDisabled}>Solution</Button>
         </Stack>}
 
