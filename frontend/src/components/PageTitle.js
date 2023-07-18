@@ -60,15 +60,20 @@ export const PageTitle = () => {
 
         {/* Highscore display for each mode click */}
 
-        <HighscoreDisplay highscore={highScore}/>
+        <Box marginTop={{xs: 4, sm: 10, lg: 6}}>
+          
+          <HighscoreDisplay highscore={highScore}/>
 
-        <Stack justifyContent='center' spacing={2} sx={{marginTop: '60px', marginX: '14px'}}>
+        </Box>
 
-          <Button variant='outlined' onClick={() => setActive(1)}><Typography variant='body1' sx={{color: (active === 1? 'red': 'white')}}>Old Testament</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setActive(2)} sx={{color: (active === 2? 'red': 'white')}}><Typography variant='body1'>New Testament</Typography></Button>
+        <Stack justifyContent='center' spacing={2} sx={{marginTop: {xs: '60px', sm: '70px', lg: '80px'}, marginX: '14px'}}>
 
-          <Button variant='outlined' onClick={() => setActive(3)} sx={{color: (active === 3? 'red': 'white')}}><Typography variant='body1'>Mixed</Typography></Button>
+          <Button variant='outlined' onClick={() => setActive(1)}><Typography sx={{color: (active === 1? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Old Testament</Typography></Button>
+
+          <Button variant='outlined' onClick={() => setActive(2)} ><Typography variant='body1' sx={{color: (active === 2? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>New Testament</Typography></Button>
+
+          <Button variant='outlined' onClick={() => setActive(3)} ><Typography variant='body1' sx={{color: (active === 3? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Mixed</Typography></Button>
 
           {/* <TextField
           variant='outlined'
@@ -91,13 +96,14 @@ export const PageTitle = () => {
         <Stack 
         direction='row' 
         justifyContent='center' 
-        marginTop={4}spacing={8}
+        marginTop={{xs: 4, sm: 10, lg: 7}}
+        spacing={{xs: 2, sm: 5, lg: 6}}
         >
-          <Button variant='outlined' onClick={() => setMode({level: 4, time:30})}><Typography variant='body1' sx={{color: (mode.level === 4? 'red': 'white')}}>Easy</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 4, time:30})}><Typography variant='body1' sx={{color: (mode.level === 4? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Easy</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setMode({level: 5, time:40})} sx={{color: (mode.level === 5? 'red': 'white')}}><Typography variant='body1'>Medium</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 5, time:40})} ><Typography variant='body1' sx={{color: (mode.level === 5? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Medium</Typography></Button>
 
-          <Button variant='outlined' onClick={() => setMode({level: 6, time:50})} sx={{color: (mode.level === 6? 'red': 'white')}}><Typography variant='body1'>Hard</Typography></Button>
+          <Button variant='outlined' onClick={() => setMode({level: 6, time:50})} ><Typography variant='body1' sx={{color: (mode.level === 6? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Hard</Typography></Button>
         </Stack>
 
 
@@ -107,7 +113,7 @@ export const PageTitle = () => {
           <Button variant='outlined' size='large'>Hard</Button> */}
           <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
            
-              <Button onClick={setCategory}><Typography variant='h4' color='error'>START</Typography></Button>
+              <Button variant='contained' onClick={setCategory}><Typography variant='h4' sx={{color: 'white'}}>START</Typography></Button>
         
             </Link>
         </Stack>

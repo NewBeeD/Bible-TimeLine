@@ -5,6 +5,7 @@ import { LeaderBoard } from "./pages/LeaderBoard";
 
 
 
+
 function App() {
   return (
     <div className="App">
