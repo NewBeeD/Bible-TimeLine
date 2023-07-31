@@ -14,7 +14,7 @@ export const HighscoreDisplay = (props) => {
 
           <Typography sx={{ color: 'white'}}> Your High Score</Typography>
 
-          <Typography variant='h2' justifyContent='center' alignItems='center'  sx={{ color: 'white'}}>{props.highscore}</Typography>
+          <Typography variant='h2' justifyContent='center' alignItems='center'  sx={{ color: 'white'}}>{props.highscore? props.highscore: 0}</Typography>
 
         </Box>
 
