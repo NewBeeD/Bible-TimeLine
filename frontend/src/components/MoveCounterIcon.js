@@ -3,23 +3,20 @@ import { Typography } from "@mui/material"
 
 export const MoveCounterIcon = ({moveCounter, level}) => {
 
-
-  const [remainingMove, setRemainingMoves] = useState(level + 2)
+  const [remainingMove, setRemainingMoves] = useState(level + 1)
 
 
   useEffect(()=>{
 
-    if(remainingMove > 0){
-      setRemainingMoves(()=> (level + 2) - moveCounter)
+    if(remainingMove > -1){
+      setRemainingMoves(()=> (remainingMove) - 1)
+
     }
-
     
-  }, [moveCounter])
-
-
+  }, [moveCounter]) 
 
 
   return (
-    (remainingMove > 0? (<Typography variant="h1" sx={{color: (remainingMove < 3? 'red': 'inherit')}}>{remainingMove}</Typography>): '')
+    (remainingMove > -1? (<Typography variant="h1" sx={{color: (remainingMove < 3? 'red': 'inherit')}}>{remainingMove}</Typography>): '')
   )
 }
