@@ -195,10 +195,10 @@ export const Gamepage = () => {
     setData(solutionData)
     setTimeout(setBlue, 1000)
     setBtnNxtDisabled(true)
-    setScore(0)
+    setScore(score)
     
     
-    setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 1000);
+    setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 300);
     
   }
 
@@ -228,6 +228,8 @@ export const Gamepage = () => {
     else{
       updateCookie(difficulty, score)
     }
+
+    setScore(score)
     
   }
 

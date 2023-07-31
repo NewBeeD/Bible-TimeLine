@@ -34,7 +34,11 @@ export const PageTitle = () => {
 
   useEffect(()=>{
 
-    setHighScore(FindHighScore(active, mode))
+    if(document.cookie){setHighScore(FindHighScore(active, mode))}
+
+    else {setHighScore(0)}
+
+    
   }, [active, mode])
  
   
