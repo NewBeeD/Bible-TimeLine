@@ -57,7 +57,6 @@ export const Gamepage = () => {
 
   const moveCounterFunction = () =>{
 
-    console.log('did i run?');
 
     let gameMode = difficulty.diffMode.level
 
@@ -166,7 +165,9 @@ export const Gamepage = () => {
 
     
     if(source.draggableId !== destination.droppableId && source.index !== destination.index){
+
       setMoveCounter(() => moveCounter + 1)
+
       setData(items)
       moveCounterFunction()}
     // moveCounterFunction()
