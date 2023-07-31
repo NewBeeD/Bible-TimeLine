@@ -6,15 +6,15 @@ export const MoveCounterIcon = ({moveCounter, level}) => {
   const [remainingMove, setRemainingMoves] = useState((level + 2) - moveCounter)
 
 
-  useEffect(()=>{
+  // useEffect(()=>{
 
-    if(remainingMove > -1){
-      setRemainingMoves(()=> (remainingMove) - 1)
-    }
+  //   if(remainingMove > -1){
+  //     setRemainingMoves(()=> (remainingMove) - 1)
+  //   }
     
-  }, [moveCounter]) 
-  console.log('remainingMove',remainingMove);
-  // console.log('remainingMoves',remainingMove);
+  // }, [moveCounter]) 
+  // console.log('remainingMove',remainingMove);
+  // // console.log('remainingMoves',remainingMove);
 
 
   return (
