@@ -140,6 +140,10 @@ export const Gamepage = () => {
         case 6:
           setCounter(50 + randomNum(timer))
           break;
+
+        default:
+          setCounter(30 + randomNum(timer))
+          break;
       }
     }
     else{

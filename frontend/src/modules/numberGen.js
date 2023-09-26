@@ -1,23 +1,24 @@
-import { timelineData } from "../data/csvjson"
+import { oldTestamentEvents, newTestamentEvents, allData } from "../data/csvjson"
 
-export const numberGen = (value, difficultySettings) => {
+export const numberGen = (oldOrNewTestament, difficultySettings) => {
 
-  const [oldTest, newTest] = [0, 473];
+ 
+  // const [oldTest, newTest] = [0, 473];
   let list = [];
 
-  let bool = true;
+  // let bool = true;
 
   let events = [];
   let start_point = 0;
   let end_point = 0;
 
-  if(value === 1){
+  if(oldOrNewTestament === 1){
     start_point = 0;
     end_point = 472;
   }
-  else if( value === 2){
-    start_point = 471;
-    end_point = 582;
+  else if( oldOrNewTestament === 2){
+    start_point = 0;
+    end_point = 110;
   }
   else{
     start_point = 0;
@@ -44,9 +45,23 @@ export const numberGen = (value, difficultySettings) => {
 
   function eventsAssembler(arr){   
 
+
     for(let i = 0; i < arr.length; i++){
 
-      events.push(timelineData[arr[i] - 1])
+      switch(oldOrNewTestament){
+        case 1:
+          events.push(oldTestamentEvents[arr[i]])
+          break;
+        
+        case 2:
+          events.push(newTestamentEvents[arr[i]])
+          break;
+        
+        default:
+          events.push(allData[arr[i]])
+          break;
+      }
+
     }
 }
  
@@ -59,7 +74,7 @@ export const numberGen = (value, difficultySettings) => {
 
   eventsFinder()
 
-  // console.log(events);
+  console.log(events);
 
   return events;
   
