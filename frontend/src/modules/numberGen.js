@@ -74,8 +74,6 @@ export const numberGen = (oldOrNewTestament, difficultySettings) => {
 
   eventsFinder()
 
-  console.log(events);
-
   return events;
   
 }

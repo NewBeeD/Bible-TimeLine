@@ -3,18 +3,64 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
-import { localStorageData } from "../modules/localStorageData"
+
 import { FindHighScore } from '../modules/FindHighScore'
+
+// Firebase Support
+import { auth } from '../firebaseAuth/firebaseSDK'
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
+import { signOut } from 'firebase/auth'
 
 
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
-  const [active2, setActive2] = useState(0)
+
   const [choice, setChoice] = useState('')
   // const {difficulty, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
+  const [showSigninBtn, setShowSignInBtn] = useState(true)
+  const [name, setName] = useState('')
+
+  // Google authentication
+  const provider = new GoogleAuthProvider()
+
+  // This function is used to check if the user is signed in
+  onAuthStateChanged(auth, (user) => {
+
+      if(user){
+        setShowSignInBtn(false)
+        setName(user.displayName)
+        // console.log(user.photoURL);
+      }
+      else{
+        setShowSignInBtn(true)
+      }
+    })
+
+
+  const signinWithGoogle = () => {
+
+    signInWithPopup(auth, provider)
+    .then((results) => {
+
+      setShowSignInBtn(false)
+      console.log(results);
+    })
+    .catch((error) => console.log(error))
+  }
+
+
+  const signOutUser = () => {
+
+    console.log('In signout function');
+
+    signOut(auth).then(() => {
+      console.log('Signout Successful');
+      setShowSignInBtn(true)
+    }).catch((err) => console.log(err))
+  }
 
   
   
@@ -64,34 +110,29 @@ export const PageTitle = () => {
 
         {/* Highscore display for each mode click */}
 
-        <Box marginTop={{xs: 4, sm: 10, lg: 6}}>
+        <Box marginTop={{xs: 4, sm: 10, lg: 5}}>
           
           <HighscoreDisplay highscore={highScore}/>
 
         </Box>
 
 
-        <Stack justifyContent='center' spacing={2} sx={{marginTop: {xs: '60px', sm: '70px', lg: '80px'}, marginX: '14px'}}>
+        {!showSigninBtn && <Stack margin='auto' marginTop={2}>
+            <Link to='/leaderboard'>
+              <Button variant='contained'>
+                <Typography sx={{ color: 'white', letterSpacing: 2}}>LeaderBoard</Typography>
+              </Button>
+            </Link>
+          </Stack>}
+
+
+        <Stack justifyContent='center' spacing={2} sx={{marginTop: {xs: '60px', sm: '70px', lg: '50px'}, marginX: '14px'}}>
 
           <Button variant='outlined' onClick={() => setActive(1)}><Typography sx={{color: (active === 1? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Old Testament</Typography></Button>
 
           <Button variant='outlined' onClick={() => setActive(2)} ><Typography variant='body1' sx={{color: (active === 2? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>New Testament</Typography></Button>
 
           <Button variant='outlined' onClick={() => setActive(3)} ><Typography variant='body1' sx={{color: (active === 3? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Mixed</Typography></Button>
-
-          {/* <TextField
-          variant='outlined'
-          label="Your Choice"
-          select
-          value={choice}
-          onChange={handleChange}
-          sx={{width: '170px', input: { color: 'red' }}}>
-
-            <MenuItem value='STORY'>Stories</MenuItem>
-            <MenuItem value='CHARACTER'>Characters</MenuItem>
-            <MenuItem value='BOOKS'>Books</MenuItem>
-
-          </TextField> */}
 
 
          
@@ -121,6 +162,24 @@ export const PageTitle = () => {
         
             </Link>
         </Stack>
+
+        <Stack marginTop={2} spacing={1} sx={{ marginX: '120px'}}>
+
+          {/* <Button variant='contained'><Typography sx={{ color: 'white'}}>SignIn</Typography></Button> */}
+
+          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle}><Typography sx={{ color: 'white', letterSpacing: 2}}>SignIn with Google</Typography></Button>)}
+
+        </Stack>
+
+        {!showSigninBtn && 
+        <Stack margin='auto' marginTop={4}>
+          <Typography sx={{ color: 'white', letterSpacing: 2, textTransform: 'capitalize'}}>Welcome {name}!</Typography>
+        </Stack>
+      }
+
+      {!showSigninBtn && <Stack margin='auto' marginTop={2}>
+        <button variant='outlined' onClick={signOutUser}><Typography sx={{ letterSpacing: 1, padding: '2px', cursor: 'pointer'}}>Logout</Typography></button>
+      </Stack>}
 
       </Box>
 

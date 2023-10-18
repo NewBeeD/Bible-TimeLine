@@ -1,16 +1,39 @@
 import { Box, Typography, Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar } from "@mui/material"
 
-
-
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
 import '../Css/leaderBoardCss.css'
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
 import { sortDifficultyMode } from "../modules/SortDifficultyMode";
 
+
+// Firebase Database
+import { db } from "../firebaseAuth/firebaseSDK";
+import { auth } from '../firebaseAuth/firebaseSDK'
+import { GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth'
+import { signOut } from 'firebase/auth'
+
+
+
+
 export const LeaderBoard = () => {
+
+  // const userData = collection(db, 'leaderboard')
+  // const [allUserData, setAllUserData] = useState(null)
+
+  // useEffect(() => {
+
+  //   const getData = async () => {
+      
+  //     const data = await getDocs(userData)
+  //     setAllUserData(data.docs.map((doc) => ({...doc.data()})))
+
+  //     console.log(data.docs);
+  //   }
+
+  //   getData()
+
+  // }, [])
 
 
   const dataPoints = [
@@ -56,6 +79,9 @@ export const LeaderBoard = () => {
         setArrow({...arrow, hard: !arrow.hard})
         setData(sortDifficultyMode(dataPoints, arrow, color, 'hard'))
         break;
+
+      default:
+        break;
     }
 
     
@@ -100,7 +126,7 @@ export const LeaderBoard = () => {
    
 
     {data.map(datapoint => 
-      (<Stack direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
+      (<Stack key={datapoint.name} direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
 
         <Box width={200} sx={{textAlign: 'center'}}>
 
@@ -126,6 +152,31 @@ export const LeaderBoard = () => {
 
       
     </Stack>
+
+    // <>
+
+    // {allUserData && allUserData.map((user) =>  (
+
+    //   <Stack>
+
+    //     <Box>
+    //       Oldtestament: {user.oldtestament}
+    //     </Box>
+
+    //     <Box>
+    //     Newtestament: {user.newtestament}
+    //     </Box>
+
+    //     <Box>
+    //     Mixed: {user.mixed}
+    //     </Box>
+
+    //   </Stack>
+
+    //   )
+    // )}
+    
+    // </>
     
   )
 }

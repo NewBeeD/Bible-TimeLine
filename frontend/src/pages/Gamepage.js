@@ -62,6 +62,7 @@ export const Gamepage = () => {
 
     if(moveCounter > parseInt(gameMode, 10)){
 
+      // This is where I add the first cookie
       if(modal === true){
         firstCookie(difficulty, score)
       }
@@ -75,8 +76,6 @@ export const Gamepage = () => {
   }
 
   
-
-
   const closeDialogStartTimer = () => {
     setOpen(false);
   }
@@ -223,6 +222,8 @@ export const Gamepage = () => {
     }
   }, [])
 
+
+  // This is where saving the data functions 
   const cookieFunction = () => {
 
     setBtnNxtDisabled(true)
@@ -235,7 +236,6 @@ export const Gamepage = () => {
     }
 
     setScore(score)
-    
   }
 
   let order = eventsCheck(data)

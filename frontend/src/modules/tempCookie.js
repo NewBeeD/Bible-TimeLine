@@ -1,8 +1,43 @@
-import React from 'react'
 import Cookie from 'js-cookie'
+import { useState } from 'react';
+
+
+// Firebase Database config
+import { db } from "../firebaseAuth/firebaseSDK";
+import { auth } from '../firebaseAuth/firebaseSDK'
+import {  onAuthStateChanged } from 'firebase/auth'
+import {set, ref} from 'firebase/database'
+
+
+
+
+
 
 
 export const setCookie = (name, value, expire) => {
+
+  // const highScore = [];
+  let uid;
+  let referenceData;
+
+  onAuthStateChanged(auth, (user) => {
+
+    if(user){
+
+      uid = user.uid   
+      referenceData = ref(db, 'users/' + uid) 
+
+       set((referenceData), {
+
+      data: value
+    })
+
+    }
+    else{
+      alert('User Not Logged In')     
+    }
+  })
+
 
   const date = new Date()
   date.setTime(date.getTime() + expire * 24 * 60 * 60 * 1000)
@@ -45,7 +80,12 @@ export const firstCookie = (difficulty, score) => {
             break;
           
           case 6:
-            OT = {...OT, hard: score}
+            OT = {...OT, hard: score};
+            break;
+          
+          default:
+            break;
+          
         }
       }
       
@@ -63,6 +103,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             NT = {...NT, hard: score}
+            break;
+          
+          default:
+            break;
         }
       }
 
@@ -80,6 +124,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             MX = {...MX, hard: score}
+            break;
+          
+          default:
+            break;
         }
       }
 
@@ -98,6 +146,9 @@ export const firstCookie = (difficulty, score) => {
 
       case 3:
         difficultyCheck('MX')
+        break;
+      
+      default:
         break;
     }
 
@@ -145,6 +196,9 @@ export const updateCookie = (difficulty, score) => {
       case 3:
         compareScore('MX')
         break;
+      
+      default:
+        break;
 
     }
     
@@ -189,79 +243,6 @@ export const updateCookie = (difficulty, score) => {
   cookieData = {OT, NT, MX}
 
   setCookie(cookieName, cookieData, 25550)  
-
-
-  // const difficultyCheck = (mode) =>{
-
-  //   if(mode === 'OT'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         OT = {...OT, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         OT = {...OT, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         OT = {...OT, hard: score}
-  //     }
-  //   }
-    
-  //   else if(mode === 'NT'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         NT = {...NT, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         NT = {...NT, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         NT = {...NT, hard: score}
-  //     }
-  //   }
-
-  //   else if(mode === 'MX'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         MX = {...MX, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         MX = {...MX, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         MX = {...MX, hard: score}
-  //     }
-  //   }
-
-  // }
-
-  // switch(gameMode){
-
-  //   case 1:
-  //     difficultyCheck('OT')
-  //     break;
-    
-  //   case 2:
-  //     difficultyCheck('NT')
-  //     break;
-
-  //   case 3:
-  //     difficultyCheck('MX')
-  //     break;
-  // }
-
-
 
 }
 
