@@ -24,7 +24,7 @@ export const PageTitle = () => {
   const [highScore, setHighScore] = useState()
   const [showSigninBtn, setShowSignInBtn] = useState(true)
   const [name, setName] = useState('')
-  let userHighScores;
+
 
 
   // Google authentication
@@ -85,20 +85,21 @@ export const PageTitle = () => {
           const userHighScores = snapshot.val()
           dispatch({type: 'SET_DATA', payload: userHighScores})
           setHighScore(FindHighScore(active, mode, userHighScores))
-
-          console.log('Inside Onvalue', userHighScores);
         
         })
       }
       else{
+        
         setShowSignInBtn(true)
+        const blankScores = {OT: {easy: 0, medium: 0, hard: 0}, NT: {easy: 0, medium: 0, hard: 0}, MX : {easy: 0, medium: 0, hard: 0}}
+
+        setHighScore(FindHighScore(active, mode, blankScores))
       }
     })
 
     // if(document.cookie){setHighScore(FindHighScore(active, mode, userHighScores))}
 
     // else {setHighScore(0)}
-
     
   }, [active, mode])
  

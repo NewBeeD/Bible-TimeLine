@@ -12,8 +12,6 @@ import {set, ref, onValue} from 'firebase/database'
 
 export const setCookie = (name, value, expire) => {
 
-  
-
 
   let highScore;
   let uid;
@@ -26,7 +24,7 @@ export const setCookie = (name, value, expire) => {
       uid = user.uid   
       referenceData = ref(db, 'users/' + uid)      
 
-       set((referenceData), {
+      set((referenceData), {
 
       data: value
     })
@@ -194,6 +192,9 @@ export const updateCookie = (difficulty, score) => {
       case 3:
         compareScore('MX')
         break;
+      
+      default:
+        break;
 
     }
     
@@ -240,78 +241,7 @@ export const updateCookie = (difficulty, score) => {
   setCookie(cookieName, cookieData, 25550)  
 
 
-  // const difficultyCheck = (mode) =>{
-
-  //   if(mode === 'OT'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         OT = {...OT, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         OT = {...OT, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         OT = {...OT, hard: score}
-  //     }
-  //   }
-    
-  //   else if(mode === 'NT'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         NT = {...NT, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         NT = {...NT, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         NT = {...NT, hard: score}
-  //     }
-  //   }
-
-  //   else if(mode === 'MX'){
-
-  //     switch(diffMode){
-
-  //       case 4:
-  //         MX = {...MX, easy: score}
-  //         break;
-        
-  //       case 5:
-  //         MX = {...MX, medium: score}
-  //         break;
-        
-  //       case 6:
-  //         MX = {...MX, hard: score}
-  //     }
-  //   }
-
-  // }
-
-  // switch(gameMode){
-
-  //   case 1:
-  //     difficultyCheck('OT')
-  //     break;
-    
-  //   case 2:
-  //     difficultyCheck('NT')
-  //     break;
-
-  //   case 3:
-  //     difficultyCheck('MX')
-  //     break;
-  // }
-
-
-
+ 
 }
 
 
