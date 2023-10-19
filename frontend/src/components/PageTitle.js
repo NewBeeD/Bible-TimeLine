@@ -3,18 +3,55 @@ import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
-import { localStorageData } from "../modules/localStorageData"
+// import { localStorageData } from "../modules/localStorageData"
 import { FindHighScore } from '../modules/FindHighScore'
+
+
+// Firebase Support
+import { auth, db } from '../firebaseAuth/firebaseSDK'
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
+import { signOut } from 'firebase/auth'
+import {set, ref, onValue} from 'firebase/database'
 
 
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
-  const [active2, setActive2] = useState(0)
+
   const [choice, setChoice] = useState('')
-  // const {difficulty, dispatch} = useTimeLineContext()
+  const {userData, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
+  const [showSigninBtn, setShowSignInBtn] = useState(true)
+  const [name, setName] = useState('')
+  let userHighScores;
+
+
+  // Google authentication
+  const provider = new GoogleAuthProvider()
+
+
+  const signinWithGoogle = () => {
+
+    signInWithPopup(auth, provider)
+    .then((results) => {
+
+      setShowSignInBtn(false)
+      console.log(results);
+    })
+    .catch((error) => console.log(error))
+  }
+
+
+  const signOutUser = () => {
+
+    console.log('In signout function');
+
+    signOut(auth).then(() => {
+      console.log('Signout Successful');
+      setShowSignInBtn(true)
+    }).catch((err) => console.log(err))
+  }
 
   
   
@@ -34,9 +71,33 @@ export const PageTitle = () => {
 
   useEffect(()=>{
 
-    if(document.cookie){setHighScore(FindHighScore(active, mode))}
+    onAuthStateChanged(auth, (user) => {
 
-    else {setHighScore(0)}
+      if(user){
+        setShowSignInBtn(false)
+        setName(user.displayName)
+        // console.log(user.photoURL);
+
+        const userData = ref(db, 'users/' + user.uid + '/data')
+
+        onValue(userData, (snapshot) => {
+
+          const userHighScores = snapshot.val()
+          dispatch({type: 'SET_DATA', payload: userHighScores})
+          setHighScore(FindHighScore(active, mode, userHighScores))
+
+          console.log('Inside Onvalue', userHighScores);
+        
+        })
+      }
+      else{
+        setShowSignInBtn(true)
+      }
+    })
+
+    // if(document.cookie){setHighScore(FindHighScore(active, mode, userHighScores))}
+
+    // else {setHighScore(0)}
 
     
   }, [active, mode])
@@ -69,6 +130,17 @@ export const PageTitle = () => {
           <HighscoreDisplay highscore={highScore}/>
 
         </Box>
+
+
+        {/* Leaderboard Button display on successful login */}
+
+        {!showSigninBtn && <Stack margin='auto' marginTop={2}>
+            <Link to='/leaderboard'>
+              <Button variant='contained'>
+                <Typography sx={{ color: 'white', letterSpacing: 2}}>LeaderBoard</Typography>
+              </Button>
+            </Link>
+          </Stack>}
 
 
         <Stack justifyContent='center' spacing={2} sx={{marginTop: {xs: '60px', sm: '70px', lg: '80px'}, marginX: '14px'}}>
@@ -121,6 +193,24 @@ export const PageTitle = () => {
         
             </Link>
         </Stack>
+
+        <Stack marginTop={2} spacing={1} sx={{ marginX: '120px'}}>
+
+          {/* <Button variant='contained'><Typography sx={{ color: 'white'}}>SignIn</Typography></Button> */}
+
+          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle}><Typography sx={{ color: 'white', letterSpacing: 2}}>SignIn with Google</Typography></Button>)}
+
+        </Stack>
+
+        {!showSigninBtn && 
+        <Stack margin='auto' marginTop={4}>
+          <Typography sx={{ color: 'white', letterSpacing: 2, textTransform: 'capitalize'}}>Welcome {name}!</Typography>
+        </Stack>
+        }
+
+        {!showSigninBtn && <Stack margin='auto' marginTop={2}>
+          <button variant='outlined' onClick={signOutUser}><Typography sx={{ letterSpacing: 1, padding: '2px', cursor: 'pointer'}}>Logout</Typography></button>
+        </Stack>}
 
       </Box>
 

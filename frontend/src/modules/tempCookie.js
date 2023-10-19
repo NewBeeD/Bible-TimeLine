@@ -2,8 +2,42 @@ import React from 'react'
 import Cookie from 'js-cookie'
 
 
+// Firebase Database config
+import { db } from "../firebaseAuth/firebaseSDK";
+import { auth } from '../firebaseAuth/firebaseSDK'
+import {  onAuthStateChanged } from 'firebase/auth'
+import {set, ref, onValue} from 'firebase/database'
+
+
+
 export const setCookie = (name, value, expire) => {
 
+  
+
+
+  let highScore;
+  let uid;
+  let referenceData;
+
+  onAuthStateChanged(auth, (user) => {
+
+    if(user){
+
+      uid = user.uid   
+      referenceData = ref(db, 'users/' + uid)      
+
+       set((referenceData), {
+
+      data: value
+    })
+
+    }
+    else{
+      alert('User Not Logged In')     
+    }
+  })
+
+  
   const date = new Date()
   date.setTime(date.getTime() + expire * 24 * 60 * 60 * 1000)
   let expireDate = "expires=" + date.toUTCString()
@@ -46,6 +80,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             OT = {...OT, hard: score}
+            break;
+
+          default:
+            break;
         }
       }
       
@@ -63,6 +101,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             NT = {...NT, hard: score}
+            break;
+          
+          default:
+            break;
         }
       }
 
@@ -80,6 +122,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             MX = {...MX, hard: score}
+            break;
+        
+          default:
+            break;
         }
       }
 
@@ -98,6 +144,9 @@ export const firstCookie = (difficulty, score) => {
 
       case 3:
         difficultyCheck('MX')
+        break;
+
+      default:
         break;
     }
 
