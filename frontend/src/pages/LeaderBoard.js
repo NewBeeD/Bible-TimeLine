@@ -97,16 +97,7 @@ export const LeaderBoard = () => {
   
   return (
 
-    // <>
-    //   <Stack paddingTop={20} alignItems='center' margin='auto'>
-    //     <Box>
-
-    //       <Typography fontSize={{xs:"40px", sm: '50px', md: '60px', lg: '70px'}}>COMING SOON!!</Typography>
-
-    //     </Box>
-        
-    //   </Stack>
-    // </>
+    
 
     <Stack marginTop={8} alignItems='center' sx={{ width: '100%', height: '100vh'}}>  
 
@@ -115,9 +106,31 @@ export const LeaderBoard = () => {
     </Box>
 
     <Stack direction='row' marginTop={8} spacing={5}>
-      <Button variant="outlined" onClick={() => filterData('oldtestament')} sx={{color: (color === 'oldtestament'? 'red': 'black')}}>Old Testament</Button>
-      <Button variant="outlined" onClick={() => filterData('newtestament')} sx={{color: (color === 'newtestament'? 'red': 'black')}}>New-Testament</Button>
-      <Button variant="outlined" onClick={() => filterData('mixed')} sx={{color: (color === 'mixed'? 'red': 'black')}}>Mixed</Button>
+      <Button variant="outlined" onClick={() => filterData('oldtestament')} sx={{color: (color === 'oldtestament'? 'red': 'black'), width: {xs: 30, sm: 130, md: 140, lg: 170}}}>
+
+        <Typography sx={{ fontSize: {xs: 12, sm: 15, md: 17, lg: 20}}}>
+          Old Testament
+        </Typography>
+        
+
+        
+      </Button>
+
+      <Button variant="outlined" onClick={() => filterData('newtestament')} sx={{color: (color === 'newtestament'? 'red': 'black'), width: {xs: 30, sm: 130, md: 140, lg: 170}}}>
+        
+        <Typography sx={{ fontSize: {xs: 12, sm: 15, md: 17, lg: 20}}}>
+          New Testament
+        </Typography>
+        
+      </Button>
+      
+      <Button variant="outlined" onClick={() => filterData('mixed')} sx={{color: (color === 'mixed'? 'red': 'black'), width: {xs: 30, sm: 130, md: 140, lg: 170}}}>
+        
+        <Typography sx={{ fontSize: {xs: 12, sm: 15, md: 17, lg: 20}}}>
+          Mixed
+        </Typography>
+
+      </Button>
     </Stack>
 
     <Stack direction='row' marginTop={8} marginBottom={4} height='40px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
@@ -145,12 +158,18 @@ export const LeaderBoard = () => {
     {allUserData ? (data.map(datapoint => 
       (<Stack direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
 
-        <Box width={200} sx={{textAlign: 'center' }}>
+        <Box width={200} sx={{textAlign: 'center', paddingY: 10}}>
 
-          <Typography sx={{textTransform: 'capitalize'}}>{datapoint.playerName}</Typography>
+          <Stack justifyContent='center' direction='row'>
 
-          {/* <img src={datapoint.playerImg} width={40} height={40} alt=""/> */}
-          
+            {/* <img src={datapoint.playerImg} width={40} height={40} alt=""/> */}
+
+            <Typography sx={{textTransform: 'capitalize', fontSize: {xs: 12, sm: 20, md: 20, lg: 22}}}>{datapoint.playerName}</Typography>
+
+            {/* <img src={datapoint.playerImg} width={40} height={40} alt=""/> */}
+
+            
+          </Stack>        
           
         </Box>
 
