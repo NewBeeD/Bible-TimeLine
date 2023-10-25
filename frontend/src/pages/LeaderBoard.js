@@ -5,6 +5,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import '../Css/leaderBoardCss.css'
 import { useState, useEffect } from "react"
 import { sortDifficultyMode } from "../modules/SortDifficultyMode";
+import { Link } from "react-router-dom";
 
 // Firebase Database config
 import { db } from "../firebaseAuth/firebaseSDK";
@@ -99,9 +100,22 @@ export const LeaderBoard = () => {
 
     
 
-    <Stack marginTop={8} alignItems='center' sx={{ width: '100%', height: '100vh'}}>  
+    <Stack marginTop={7} alignItems='center' sx={{ width: '100%', height: '100vh'}}>  
 
-    <Box marginTop={0}>
+    <Stack>
+
+      <Box>
+
+        <Link to='/'>
+
+          <Typography variant="h3" sx={{color: 'blue'}}>Home</Typography>
+
+        </Link>
+        
+      </Box>
+    </Stack>
+
+    <Box marginTop={10}>
       <Typography variant="h3">LEADERBOARD</Typography>
     </Box>
 
