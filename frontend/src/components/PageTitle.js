@@ -19,7 +19,7 @@ export const PageTitle = () => {
   const [active, setActive] = useState(2)
 
   const [choice, setChoice] = useState('')
-  const {userData, dispatch} = useTimeLineContext()
+  const {contextData, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
   const [showSigninBtn, setShowSignInBtn] = useState(true)
@@ -76,8 +76,7 @@ export const PageTitle = () => {
       if(user){
         setShowSignInBtn(false)
         setName(user.displayName)
-        // console.log(user.photoURL);
-
+  
         const userData = ref(db, 'users/' + user.uid + '/data')
 
         onValue(userData, (snapshot) => {

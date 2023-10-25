@@ -26,7 +26,9 @@ export const setCookie = (name, value, expire) => {
 
       set((referenceData), {
 
-      data: value
+      userName: user.displayName,
+      data: value,
+      userImg: user.photoURL
     })
 
     }

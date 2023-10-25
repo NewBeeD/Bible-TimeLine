@@ -1,4 +1,4 @@
-import { Box, Typography, Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar } from "@mui/material"
+import { Box, Typography,  Stack, Button, Skeleton } from "@mui/material"
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -11,27 +11,10 @@ import { db } from "../firebaseAuth/firebaseSDK";
 import { auth } from '../firebaseAuth/firebaseSDK'
 import {  onAuthStateChanged } from 'firebase/auth'
 import {set, ref, onValue} from 'firebase/database'
+import { leaderboardData } from "../modules/leaderboardEntries";
 
 
-
-export const LeaderBoard = () => {
-
-  const [userHighScores, setUserHighScores] = useState([])
-
-
-  useEffect(() =>{
-    
-    const userData = ref(db, 'users/')
-
-
-    onValue(userData, (snapshot) => {
-      let highScore = snapshot.val()
-      setUserHighScores(highScore)
-    })
-  }, [])
-
-
-  const dataPoints = [
+const dataPoints = [
     {name: 'Danphil', easyscore: '9', mediumscore: '7', hardscore: '4', difficulty: 'easy', mode: 'newtestament'},
     {name: 'Lee', easyscore: '11', mediumscore: '3', hardscore: '2', difficulty: 'easy', mode: 'oldtestament'},
     {name: 'Kalinda', easyscore: '5', mediumscore: '4', hardscore: '8', difficulty: 'medium', mode: 'newtestament'},
@@ -43,36 +26,64 @@ export const LeaderBoard = () => {
     
   ]
 
-  const initialPrint = dataPoints.filter(modeName => modeName.mode === 'newtestament')
 
-  const [data, setData] = useState(initialPrint)
+
+export const LeaderBoard = () => {
+
+  const [userHighScores, setUserHighScores] = useState([])
+  const [allUserData, setAllUserData] = useState(false)
+
+
+  useEffect(() =>{
+    
+    const userData = ref(db, 'users/')
+
+    onValue(userData, (snapshot) => {
+      let highScore = snapshot.val()
+      const playerDataOrganized = leaderboardData(highScore)
+      const firstEntry = playerDataOrganized.filter(modeName => modeName.mode === 'newtestament')
+      setAllUserData(playerDataOrganized)
+      setData(firstEntry)
+      console.log(playerDataOrganized);
+    })
+  }, [])
+
+  // Problem function
+  // const initialPrint = allUserData.filter(modeName => modeName.mode === 'newtestament')
+
+  // console.log(initialPrint);
+
+  const [data, setData] = useState()
   const [color, setColor] = useState('newtestament')
   const [arrow, setArrow] = useState({easy: false, medium: false, hard: false})
 
+  // This function is used to filter the user data by game mode category
   const filterData = (gameMode) => {
  
-    let newScores = dataPoints.filter(modeName => modeName.mode === gameMode)
+    let newScores = allUserData.filter(modeName => modeName.mode === gameMode)
+    console.log(newScores);
     setData(newScores)
     setColor(gameMode)
   }
 
+  // This is a sorting function by organizing datapoint from high to low (vice-versa)
   const sortFunction = (difficultyMode) => {
 
     switch(difficultyMode){
 
       case 'easy':
         setArrow({...arrow, easy: !arrow.easy})
-        setData(sortDifficultyMode(dataPoints, arrow, color, 'easy'))
+        setData(sortDifficultyMode(data, arrow, color, 'easy'))
         break;
       
       case 'medium':
         setArrow({...arrow, medium: !arrow.medium})
-        setData(sortDifficultyMode(dataPoints, arrow, color, 'medium'))
+        setData(sortDifficultyMode(data, arrow, color, 'medium'))
         break;
 
       case 'hard':
         setArrow({...arrow, hard: !arrow.hard})
-        setData(sortDifficultyMode(dataPoints, arrow, color, 'hard'))
+        setData(sortDifficultyMode(data, arrow, color, 'hard'))
         break;
       
       default:
@@ -86,78 +97,80 @@ export const LeaderBoard = () => {
   
   return (
 
-    <>
-      <Stack paddingTop={20} alignItems='center' margin='auto'>
-        <Box>
+    // <>
+    //   <Stack paddingTop={20} alignItems='center' margin='auto'>
+    //     <Box>
 
-          <Typography fontSize={{xs:"40px", sm: '50px', md: '60px', lg: '70px'}}>COMING SOON!!</Typography>
+    //       <Typography fontSize={{xs:"40px", sm: '50px', md: '60px', lg: '70px'}}>COMING SOON!!</Typography>
 
-        </Box>
+    //     </Box>
         
-      </Stack>
-    </>
+    //   </Stack>
+    // </>
 
-  //   <Stack justifyContent='center' alignItems='center' sx={{ width: '100%', height: '100vh'}}>  
+    <Stack marginTop={8} alignItems='center' sx={{ width: '100%', height: '100vh'}}>  
 
-  //   <Box marginTop={0}>
-  //     <Typography variant="h3">LEADERBOARD</Typography>
-  //   </Box>
+    <Box marginTop={0}>
+      <Typography variant="h3">LEADERBOARD</Typography>
+    </Box>
 
-  //   <Stack direction='row' marginTop={8} spacing={5}>
-  //     <Button variant="outlined" onClick={() => filterData('oldtestament')} sx={{color: (color === 'oldtestament'? 'red': 'black')}}>Old Testament</Button>
-  //     <Button variant="outlined" onClick={() => filterData('newtestament')} sx={{color: (color === 'newtestament'? 'red': 'black')}}>New-Testament</Button>
-  //     <Button variant="outlined" onClick={() => filterData('mixed')} sx={{color: (color === 'mixed'? 'red': 'black')}}>Mixed</Button>
-  //   </Stack>
+    <Stack direction='row' marginTop={8} spacing={5}>
+      <Button variant="outlined" onClick={() => filterData('oldtestament')} sx={{color: (color === 'oldtestament'? 'red': 'black')}}>Old Testament</Button>
+      <Button variant="outlined" onClick={() => filterData('newtestament')} sx={{color: (color === 'newtestament'? 'red': 'black')}}>New-Testament</Button>
+      <Button variant="outlined" onClick={() => filterData('mixed')} sx={{color: (color === 'mixed'? 'red': 'black')}}>Mixed</Button>
+    </Stack>
 
-  //   <Stack direction='row' marginTop={8} marginBottom={4} height='40px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
+    <Stack direction='row' marginTop={8} marginBottom={4} height='40px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
 
-  //     <Box width={200} sx={{textAlign: 'center'}}>
-  //       Name
-  //     </Box>
+      <Box width={200} sx={{textAlign: 'center'}}>
+        Name
+      </Box>
 
-  //     <Box width={200} sx={{textAlign: 'center'}}>
-  //       <Button className="leaderBoard" variant="text" onClick={() => sortFunction('easy')} endIcon={arrow.easy?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Easy</Button>
-  //     </Box>
+      <Box width={200} sx={{textAlign: 'center'}}>
+        <Button className="leaderBoard" variant="text" onClick={() => sortFunction('easy')} endIcon={arrow.easy?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Easy</Button>
+      </Box>
 
-  //     <Box width={200} sx={{textAlign: 'center'}}>
-  //       <Button className="leaderBoard" variant="text"  onClick={() => sortFunction('medium')} endIcon={arrow.medium?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Medium</Button>
-  //     </Box>
+      <Box width={200} sx={{textAlign: 'center'}}>
+        <Button className="leaderBoard" variant="text"  onClick={() => sortFunction('medium')} endIcon={arrow.medium?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Medium</Button>
+      </Box>
 
-  //     <Box width={200} sx={{textAlign: 'center'}}>
-  //       <Button className="leaderBoard" variant="text" onClick={() => sortFunction('hard')} endIcon={arrow.hard?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Hard</Button>
-  //     </Box>
+      <Box width={200} sx={{textAlign: 'center'}}>
+        <Button className="leaderBoard" variant="text" onClick={() => sortFunction('hard')} endIcon={arrow.hard?<KeyboardArrowDownIcon/>: <KeyboardArrowUpIcon/>} disableRipple>Hard</Button>
+      </Box>
 
-  //   </Stack>
+    </Stack>
 
    
 
-  //   {data.map(datapoint => 
-  //     (<Stack direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
+    {allUserData ? (data.map(datapoint => 
+      (<Stack direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
 
-  //       <Box width={200} sx={{textAlign: 'center'}}>
+        <Box width={200} sx={{textAlign: 'center' }}>
 
-  //         {datapoint.name}
+          <Typography sx={{textTransform: 'capitalize'}}>{datapoint.playerName}</Typography>
+
+          {/* <img src={datapoint.playerImg} width={40} height={40} alt=""/> */}
           
-  //       </Box>
+          
+        </Box>
 
-  //       <Box width={200} sx={{textAlign: 'center'}}>
-  //         {datapoint.easyscore === '0'? '-': datapoint.easyscore}
-  //       </Box>
+        <Box width={200} sx={{textAlign: 'center'}}>
+          {datapoint.easy === 0? '-': datapoint.easy}
+        </Box>
 
-  //       <Box width={200} sx={{textAlign: 'center'}}>
-  //         {datapoint.mediumscore === '0'? '-': datapoint.mediumscore}
-  //       </Box>
+        <Box width={200} sx={{textAlign: 'center'}}>
+          {datapoint.medium === 0? '-': datapoint.medium}
+        </Box>
 
-  //       <Box width={200} sx={{textAlign: 'center'}}>
-  //         {datapoint.hardscore === '0'? '-': datapoint.hardscore}
-  //       </Box>
+        <Box width={200} sx={{textAlign: 'center'}}>
+          {datapoint.hard === 0? '-': datapoint.hard}
+        </Box>
 
-  //       </Stack>)
-  //     )}
-
+        </Stack>)
+      )): <Skeleton variant="rectangular" width='90%' height='20%' animation="wave"/>}
 
       
-  //   </Stack>
+    </Stack>
     
   )
 }
