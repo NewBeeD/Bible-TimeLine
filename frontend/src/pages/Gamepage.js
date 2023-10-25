@@ -171,7 +171,6 @@ export const Gamepage = () => {
     if(source.draggableId !== destination.droppableId && source.index !== destination.index){
 
       setMoveCounter(() => moveCounter + 1)
-
       setData(items)
       moveCounterFunction()}
     // moveCounterFunction()

@@ -13,13 +13,15 @@ import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebas
 import { signOut } from 'firebase/auth'
 import {set, ref, onValue} from 'firebase/database'
 
+const blankScores = {OT: {easy: 0, medium: 0, hard: 0}, NT: {easy: 0, medium: 0, hard: 0}, MX : {easy: 0, medium: 0, hard: 0}}
+
 
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
 
   const [choice, setChoice] = useState('')
-  const {userData, dispatch} = useTimeLineContext()
+  const {contextData, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
   const [showSigninBtn, setShowSignInBtn] = useState(true)
@@ -76,23 +78,27 @@ export const PageTitle = () => {
       if(user){
         setShowSignInBtn(false)
         setName(user.displayName)
-        // console.log(user.photoURL);
-
+  
         const userData = ref(db, 'users/' + user.uid + '/data')
 
         onValue(userData, (snapshot) => {
 
           const userHighScores = snapshot.val()
-          dispatch({type: 'SET_DATA', payload: userHighScores})
-          setHighScore(FindHighScore(active, mode, userHighScores))
-        
+          
+          // Set highscores for new users
+          if(userHighScores === null){
+            setHighScore(FindHighScore(active, mode, blankScores))
+          }
+          else{
+            dispatch({type: 'SET_DATA', payload: userHighScores})
+            setHighScore(FindHighScore(active, mode, userHighScores))
+          }
+          
         })
       }
       else{
         
         setShowSignInBtn(true)
-        const blankScores = {OT: {easy: 0, medium: 0, hard: 0}, NT: {easy: 0, medium: 0, hard: 0}, MX : {easy: 0, medium: 0, hard: 0}}
-
         setHighScore(FindHighScore(active, mode, blankScores))
       }
     })

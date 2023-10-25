@@ -9,49 +9,43 @@ export const sortDifficultyMode = (dataPoints, arrow, gameMode, difficultyMode) 
   // homes.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
 
 
-  console.log(arrow);
-
   let newScores = dataPoints.filter(modeName => modeName.mode === gameMode)
 
   if(difficultyMode === 'easy'){
 
     if(arrow.easy){
 
-      newScores.sort((a, b) => parseFloat(a.easyscore) - parseFloat(b.easyscore));
+      newScores.sort((a, b) => parseFloat(a.easy) - parseFloat(b.easy));
     }
     else{
 
-      newScores.sort((a, b) => parseFloat(b.easyscore) - parseFloat(a.easyscore));
+      newScores.sort((a, b) => parseFloat(b.easy) - parseFloat(a.easy));
     }
 
   }
 
   else if(difficultyMode === 'medium'){
 
-    console.log('inside if');
-
     if(arrow.medium){
 
-      newScores.sort((a, b) => parseFloat(a.mediumscore) - parseFloat(b.mediumscore));
+      newScores.sort((a, b) => parseFloat(a.medium) - parseFloat(b.medium));
     }
     else{
 
-      newScores.sort((a, b) => parseFloat(b.mediumscore) - parseFloat(a.mediumscore));
+      newScores.sort((a, b) => parseFloat(b.medium) - parseFloat(a.medium));
     }
 
   }
 
   else if(difficultyMode === 'hard'){
 
-    console.log('inside if');
-
     if(arrow.hard){
 
-      newScores.sort((a, b) => parseFloat(a.hardscore) - parseFloat(b.hardscore));
+      newScores.sort((a, b) => parseFloat(a.hard) - parseFloat(b.hard));
     }
     else{
 
-      newScores.sort((a, b) => parseFloat(b.hardscore) - parseFloat(a.hardscore));
+      newScores.sort((a, b) => parseFloat(b.hard) - parseFloat(a.hard));
     }
 
   }
