@@ -15,17 +15,17 @@ import {set, ref, onValue} from 'firebase/database'
 import { leaderboardData } from "../modules/leaderboardEntries";
 
 
-const dataPoints = [
-    {name: 'Danphil', easyscore: '9', mediumscore: '7', hardscore: '4', difficulty: 'easy', mode: 'newtestament'},
-    {name: 'Lee', easyscore: '11', mediumscore: '3', hardscore: '2', difficulty: 'easy', mode: 'oldtestament'},
-    {name: 'Kalinda', easyscore: '5', mediumscore: '4', hardscore: '8', difficulty: 'medium', mode: 'newtestament'},
-    {name: 'Yuvanka', easyscore: '4', mediumscore: '8', hardscore: '1', difficulty: 'hard', mode: 'oldtestament'},
-    {name: 'Phillippa', easyscore: '8', mediumscore: '9', hardscore: '3', difficulty: 'easy', mode: 'newtestament'},
-    {name: 'Johnny', easyscore: '15', mediumscore: '5', hardscore: '4', difficulty: 'medium', mode: 'mixed'},
-    {name: 'Greg', easyscore: '9', mediumscore: '0', hardscore: '7', difficulty: 'hard', mode: 'oldtestament'},
-    {name: 'Gerrald', easyscore: '3', mediumscore: '0', hardscore: '1', difficulty: 'easy', mode: 'newtestament'}
+// const dataPoints = [
+//     {name: 'Danphil', easyscore: '9', mediumscore: '7', hardscore: '4', difficulty: 'easy', mode: 'newtestament'},
+//     {name: 'Lee', easyscore: '11', mediumscore: '3', hardscore: '2', difficulty: 'easy', mode: 'oldtestament'},
+//     {name: 'Kalinda', easyscore: '5', mediumscore: '4', hardscore: '8', difficulty: 'medium', mode: 'newtestament'},
+//     {name: 'Yuvanka', easyscore: '4', mediumscore: '8', hardscore: '1', difficulty: 'hard', mode: 'oldtestament'},
+//     {name: 'Phillippa', easyscore: '8', mediumscore: '9', hardscore: '3', difficulty: 'easy', mode: 'newtestament'},
+//     {name: 'Johnny', easyscore: '15', mediumscore: '5', hardscore: '4', difficulty: 'medium', mode: 'mixed'},
+//     {name: 'Greg', easyscore: '9', mediumscore: '0', hardscore: '7', difficulty: 'hard', mode: 'oldtestament'},
+//     {name: 'Gerrald', easyscore: '3', mediumscore: '0', hardscore: '1', difficulty: 'easy', mode: 'newtestament'}
     
-  ]
+//   ]
 
 
 
@@ -40,12 +40,14 @@ export const LeaderBoard = () => {
     const userData = ref(db, 'users/')
 
     onValue(userData, (snapshot) => {
+
       let highScore = snapshot.val()
       const playerDataOrganized = leaderboardData(highScore)
       const firstEntry = playerDataOrganized.filter(modeName => modeName.mode === 'newtestament')
       setAllUserData(playerDataOrganized)
       setData(firstEntry)
       console.log(playerDataOrganized);
+      
     })
   }, [])
 

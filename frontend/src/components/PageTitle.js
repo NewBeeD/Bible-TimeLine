@@ -87,6 +87,21 @@ export const PageTitle = () => {
           
           // Set highscores for new users
           if(userHighScores === null){
+
+            let uid;
+            let referenceData;
+
+            uid = user.uid   
+            referenceData = ref(db, 'users/' + uid)      
+
+            set((referenceData), {
+
+            userName: user.displayName,
+            data: blankScores,
+            userImg: user.photoURL
+          })
+
+
             setHighScore(FindHighScore(active, mode, blankScores))
           }
           else{
