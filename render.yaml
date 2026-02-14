@@ -10,8 +10,9 @@ services:
       - key: NODE_VERSION
         value: 20
 
-  - type: static
+  - type: web
     name: bible-timeline-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
