@@ -1,22 +1,20 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider, Switch } from "@mui/material"
+import { Box, Typography, List, ListItem, ListItemText, Paper, Container, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider, Switch } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
-import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
-import { useState, useEffect, useRef } from "react"
+import { DragDropContext, Droppable, Draggable} from '@hello-pangea/dnd'
+import { useState, useEffect } from "react"
 import { numberGen } from "../modules/numberGen"
-import { Link } from "react-router-dom"
-import { useTimeLineContext } from "../hooks/useTimeLineContext"
+import { Link, Navigate } from "react-router-dom"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
-import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "../modules/tempCookie";
+import { updateCookie, firstCookie } from "../modules/tempCookie";
 import { MoveCounterIcon } from "../components/MoveCounterIcon";
 
 
 
 import ReactCountdownClock from 'react-countdown-clock'
-import CountDownTimer from "../components/CountDownTimer";
 // import { useWindowSize } from "@uidotdev/usehooks";
 // import breakPoint from "../modules/BreakPointCalculator";
 
@@ -29,25 +27,33 @@ export const Gamepage = () => {
 
   // const {difficulty, dispatch} = useTimeLineContext()
 
-  const difficulty = JSON.parse(localStorage.getItem('data'));
+  let parsedDifficulty = null;
+
+  try {
+    parsedDifficulty = JSON.parse(localStorage.getItem('data'));
+  } catch (error) {
+    parsedDifficulty = null;
+  }
+
+  const hasValidDifficulty = !!(parsedDifficulty?.data && parsedDifficulty?.diffMode?.level && parsedDifficulty?.diffMode?.time)
+  const difficulty = hasValidDifficulty
+    ? parsedDifficulty
+    : { data: 2, diffMode: { level: 4, time: 30 } }
 
  
   const [data, setData] = useState(numberGen(difficulty.data, difficulty.diffMode.level))
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
-  const counterVal = useRef()
   const [btnNxtDisabled, setBtnNxtDisabled] = useState(false)
   const [btnSolDisabled, setBtnSolDisabled] = useState(false)
-  const [btnDisabled, setBtnDisabled] = useState(false)
 
   const [score, setScore] = useState(0)
-  const [showScore, setShowScore] = useState(true)
+  const showScore = true
 
   // const [countdown, setCountDown] = useState(() => <CountDownTimer />)
   
   const [counter, setCounter] = useState(difficulty.diffMode.time)
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
-  const [value, setValue] = useState(0);
   const [timer, setTimer] = useState(false)
   const [open, setOpen] = useState(true)
   const [moveCounter, setMoveCounter] = useState(1)
@@ -77,15 +83,6 @@ export const Gamepage = () => {
   
 
 
-  const closeDialogStartTimer = () => {
-    setOpen(false);
-  }
-
-  const handleChange = (event) => {
-    setValue(parseInt(event.target.value, 10));
-    numberGen(difficulty.data, value)
-  };
-  
   // random number added to the counter so as to render on every problem set
   const randomNum = (boolData) => {
 
@@ -97,8 +94,6 @@ export const Gamepage = () => {
     setTimer(event.target.checked);
   }
   
-
-  let newList = [];
 
   // Returns the correct order of the events
   let eventsOrder = eventsCheck(data)
@@ -140,6 +135,9 @@ export const Gamepage = () => {
         case 6:
           setCounter(50 + randomNum(timer))
           break;
+
+        default:
+          break;
       }
     }
     else{
@@ -151,7 +149,7 @@ export const Gamepage = () => {
   const handleDragDrop = (result) => {
 
 
-    const {source, destination, type, index} = result
+    const {source, destination} = result
 
     setTruth('none')
     setAnimation(false)
@@ -210,9 +208,6 @@ export const Gamepage = () => {
   
   // Setting up temporary highscore data storage
   useEffect(() => {
-
-    let data;
-
     if(document.cookie){
       setModal(false)
       setOpen(false)
@@ -234,7 +229,9 @@ export const Gamepage = () => {
     
   }
 
-  let order = eventsCheck(data)
+  if (!hasValidDifficulty) {
+    return <Navigate to='/' replace />
+  }
 
 
   if(open){
@@ -278,8 +275,8 @@ export const Gamepage = () => {
 
         {modal && <Dialog open={open} >
 
-          <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
-          <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
+          <DialogTitle><Typography component="div" variant="h4">How to Play</Typography></DialogTitle>
+          <DialogTitle><Typography component="div" variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>

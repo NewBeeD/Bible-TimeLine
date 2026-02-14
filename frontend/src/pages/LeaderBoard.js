@@ -1,4 +1,4 @@
-import { Box, Typography, Card, CardContent, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar } from "@mui/material"
+import { Box, Typography, Stack, Button } from "@mui/material"
 
 
 
@@ -56,6 +56,9 @@ export const LeaderBoard = () => {
         setArrow({...arrow, hard: !arrow.hard})
         setData(sortDifficultyMode(dataPoints, arrow, color, 'hard'))
         break;
+
+      default:
+        break;
     }
 
     
@@ -100,7 +103,7 @@ export const LeaderBoard = () => {
    
 
     {data.map(datapoint => 
-      (<Stack direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
+      (<Stack key={`${datapoint.name}-${datapoint.mode}`} direction='row' marginTop={2} height='35px' width='90%' boxShadow={5} justifyContent='center' alignItems='center' sx={{borderRadius: '7px'}} >
 
         <Box width={200} sx={{textAlign: 'center'}}>
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import Cookie from 'js-cookie'
 
 
@@ -46,6 +45,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             OT = {...OT, hard: score}
+            break;
+
+          default:
+            break;
         }
       }
       
@@ -63,6 +66,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             NT = {...NT, hard: score}
+            break;
+
+          default:
+            break;
         }
       }
 
@@ -80,6 +87,10 @@ export const firstCookie = (difficulty, score) => {
           
           case 6:
             MX = {...MX, hard: score}
+            break;
+
+          default:
+            break;
         }
       }
 
@@ -99,6 +110,9 @@ export const firstCookie = (difficulty, score) => {
       case 3:
         difficultyCheck('MX')
         break;
+
+      default:
+        break;
     }
 
 
@@ -112,15 +126,31 @@ export const firstCookie = (difficulty, score) => {
 export const getCookie = () => {
 
   const cookieName = 'bibleTimeLine'
-  const cookieData = JSON.parse(Cookie.get(cookieName)) 
-  return cookieData;
+  const cookieRaw = Cookie.get(cookieName)
+
+  if(!cookieRaw){
+    return null
+  }
+
+  try {
+    const cookieData = JSON.parse(cookieRaw)
+    return cookieData;
+  }
+  catch(error){
+    return null
+  }
 
 }
 
 export const updateCookie = (difficulty, score) => {
 
   const cookieName = 'bibleTimeLine'
-  let cookieData = JSON.parse(Cookie.get(cookieName)) 
+  let cookieData = getCookie()
+
+  if(!cookieData){
+    firstCookie(difficulty, score)
+    return
+  }
 
   let OT = {...cookieData.OT}
   let NT = {...cookieData.NT}
@@ -146,30 +176,33 @@ export const updateCookie = (difficulty, score) => {
         compareScore('MX')
         break;
 
+      default:
+        break;
+
     }
     
     function compareScore(mode){
 
       if(diffMode === 4){
         updateScore = (score > cookieData[mode].easy)
-        if(updateScore === true){updateCookie(mode, diffMode)}
+        if(updateScore === true){applyScoreUpdate(mode, diffMode)}
       }
 
       else if(diffMode === 5){
         updateScore = (score > cookieData[mode].medium)
-        if(updateScore === true){updateCookie(mode, diffMode)}
+        if(updateScore === true){applyScoreUpdate(mode, diffMode)}
       }
 
       else if(diffMode === 6){
         updateScore = (score > cookieData[mode].hard)
-        if(updateScore === true){updateCookie(mode, diffMode)}
+        if(updateScore === true){applyScoreUpdate(mode, diffMode)}
       }
     }
 
   }
 
 
-  function updateCookie(mode, difficultyLevel){
+  function applyScoreUpdate(mode, difficultyLevel){
     
     if(mode === 'OT' && difficultyLevel === 4){ OT = {...OT, easy:score}}
     if(mode === 'OT' && difficultyLevel === 5){ OT = {...OT, medium:score}}

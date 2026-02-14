@@ -1,18 +1,13 @@
-import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField, Divider } from '@mui/material'
+import { Typography, Box, Stack, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
-import { useTimeLineContext } from "../hooks/useTimeLineContext"
-import { localStorageData } from "../modules/localStorageData"
 import { FindHighScore } from '../modules/FindHighScore'
 
 
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
-  const [active2, setActive2] = useState(0)
-  const [choice, setChoice] = useState('')
-  // const {difficulty, dispatch} = useTimeLineContext()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
 
@@ -24,11 +19,6 @@ export const PageTitle = () => {
     let dataPoint = {category: 'category', data: active, diffMode: mode}
     let valueString = JSON.stringify(dataPoint)
     localStorage.setItem('data', valueString)
-  }
-
-
-  const handleChange = (e) => {
-    setChoice(e.target.value)
   }
 
 

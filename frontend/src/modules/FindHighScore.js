@@ -1,10 +1,14 @@
-import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "../modules/tempCookie";
+import { getCookie } from "../modules/tempCookie";
 
 
 export const FindHighScore = (active, mode) => {
 
-  const cookieName = 'bibleTimeLine'
-  const cookieData = getCookie(cookieName)
+  const cookieData = getCookie()
+
+  if(!cookieData){
+    return 0
+  }
+
   let gameCategory;
   let gameDifficulty;
 
@@ -21,6 +25,9 @@ export const FindHighScore = (active, mode) => {
     case 3:
       gameCategory = 'MX'
       break;
+
+    default:
+      return 0
   
   }
 
@@ -37,8 +44,11 @@ export const FindHighScore = (active, mode) => {
     case 6:
       gameDifficulty = 'hard'
       break;
+
+    default:
+      return 0
   
   }
 
-  return cookieData[gameCategory][gameDifficulty];  
+  return cookieData?.[gameCategory]?.[gameDifficulty] ?? 0
 }

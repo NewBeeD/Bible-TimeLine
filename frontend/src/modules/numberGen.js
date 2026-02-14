@@ -2,10 +2,7 @@ import { timelineData } from "../data/csvjson"
 
 export const numberGen = (value, difficultySettings) => {
 
-  const [oldTest, newTest] = [0, 473];
   let list = [];
-
-  let bool = true;
 
   let events = [];
   let start_point = 0;
@@ -13,15 +10,15 @@ export const numberGen = (value, difficultySettings) => {
 
   if(value === 1){
     start_point = 0;
-    end_point = 472;
+    end_point = 469;
   }
   else if( value === 2){
-    start_point = 471;
-    end_point = 582;
+    start_point = 470;
+    end_point = 581;
   }
   else{
     start_point = 0;
-    end_point = 582;
+    end_point = 581;
   }
 
 
@@ -30,8 +27,10 @@ export const numberGen = (value, difficultySettings) => {
   }
 
   function arrGen(){
+    const maxAvailable = (end_point - start_point) + 1
+    const targetCount = Math.min(difficultySettings, maxAvailable)
 
-    for(let i = 0; i < difficultySettings; i++){
+    while(list.length < targetCount){
 
       let randomNum = randomIntFromInterval(start_point, end_point)
 
@@ -46,7 +45,7 @@ export const numberGen = (value, difficultySettings) => {
 
     for(let i = 0; i < arr.length; i++){
 
-      events.push(timelineData[arr[i] - 1])
+      events.push(timelineData[arr[i]])
     }
 }
  

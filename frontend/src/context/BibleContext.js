@@ -11,6 +11,9 @@ export const timeLineReducer = (state, action) =>{
         difficulty: action.payload  
       }
 
+    default:
+      return state
+
   }
 
 
