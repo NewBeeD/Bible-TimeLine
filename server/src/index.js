@@ -5,7 +5,16 @@ import { allData, newTestamentEvents, oldTestamentEvents } from '../../frontend/
 const PORT = Number(process.env.PORT || 4000)
 const ROUND_PLAN_DEFAULT = [4, 4, 4, 5, 5, 6]
 
-const server = createServer()
+const server = createServer((req, res) => {
+  if(req.url === '/health'){
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ ok: true }))
+    return
+  }
+
+  res.writeHead(200, { 'Content-Type': 'text/plain' })
+  res.end('Bible Timeline PvP server running')
+})
 const io = new Server(server, {
   cors: {
     origin: '*'
