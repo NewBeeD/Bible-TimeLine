@@ -1,54 +1,21 @@
-export const FindHighScore = (active, mode, userHighScores) => {
+import { GAME_TYPES } from './gameModes'
+import { resolveCategoryFromMode, resolveDifficultyFromLevel, resolveGameTypeKey, normalizeUserScores } from './scoreSchema'
 
+export const FindHighScore = (active, mode, userHighScores, gameType = GAME_TYPES.CLASSIC) => {
 
-  let gameCategory;
-  let gameDifficulty;
+  const gameCategory = resolveCategoryFromMode(active)
+  const gameDifficulty = resolveDifficultyFromLevel(mode?.level)
+  const gameTypeKey = resolveGameTypeKey(gameType)
+  const normalized = normalizeUserScores(userHighScores)
 
-
-  switch(active){
-
-    case 1:
-      gameCategory = 'OT'
-      break;
-
-    case 2:
-      gameCategory = 'NT'
-      break;
-
-    case 3:
-      gameCategory = 'MX'
-      break;
-    
-    default:
-      break;
-  
-  }
-
-  switch(mode.level){
-
-    case 4:
-      gameDifficulty = 'easy'
-      break;
-
-    case 5:
-      gameDifficulty = 'medium'
-      break;
-
-    case 6:
-      gameDifficulty = 'hard'
-      break;
-    
-    default:
-      break;
-  
-  }
-
-
-
-  if(!gameCategory || !gameDifficulty){
+  if(!gameCategory || !gameDifficulty || !gameTypeKey){
     return 0
   }
 
-  return userHighScores[gameCategory][gameDifficulty];  
+  if(gameType === GAME_TYPES.PVP){
+    return normalized?.[gameCategory]?.pvp?.bestMatch || 0
+  }
+
+  return normalized?.[gameCategory]?.[gameTypeKey]?.[gameDifficulty] || 0
   // return 4;  
 }

@@ -13,6 +13,7 @@ import { upsertPlayerScore } from "../modules/firebaseScores";
 import { MoveCounterIcon } from "../components/MoveCounterIcon";
 import { auth } from "../firebaseAuth/firebaseSDK";
 import { onAuthStateChanged } from "firebase/auth";
+import { GAME_TYPES } from "../modules/gameModes";
 
 
 
@@ -32,7 +33,11 @@ export const Gamepage = () => {
   const location = useLocation()
   const storedDifficulty = location.state
   const shouldRedirect = !storedDifficulty || !storedDifficulty.diffMode
-  const difficulty = shouldRedirect ? {data: 2, diffMode: {level: 4, time: 30}} : storedDifficulty
+  const difficulty = shouldRedirect ? {data: 2, diffMode: {level: 4, time: 30}, gameType: GAME_TYPES.CLASSIC} : storedDifficulty
+  const gameType = difficulty.gameType || GAME_TYPES.CLASSIC
+  const unlimitedMoves = gameType !== GAME_TYPES.CLASSIC
+  const isSpeedMode = gameType === GAME_TYPES.SPEED
+  const allowSkip = isSpeedMode
 
  
   const [data, setData] = useState(numberGen(difficulty.data, difficulty.diffMode.level))
@@ -69,6 +74,9 @@ export const Gamepage = () => {
 
   const moveCounterFunction = (currentMoveCounter) =>{
 
+    if(unlimitedMoves){
+      return
+    }
 
     let gameMode = difficulty.diffMode.level
 
@@ -122,25 +130,26 @@ export const Gamepage = () => {
 
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
-      
-      
-      switch(difficulty.diffMode.level){
 
-        case 4:
-          setCounter(30 + randomNum(timer))
-          break;
-        
-        case 5:
-          setCounter(40 + randomNum(timer))
-          break;
+      if(!isSpeedMode){
+        switch(difficulty.diffMode.level){
 
-        case 6:
-          setCounter(50 + randomNum(timer))
-          break;
+          case 4:
+            setCounter(30 + randomNum(timer))
+            break;
+          
+          case 5:
+            setCounter(40 + randomNum(timer))
+            break;
 
-        default:
-          setCounter(30 + randomNum(timer))
-          break;
+          case 6:
+            setCounter(50 + randomNum(timer))
+            break;
+
+          default:
+            setCounter(30 + randomNum(timer))
+            break;
+        }
       }
     }
     else{
@@ -191,6 +200,17 @@ export const Gamepage = () => {
     setBlankTimer(true)
 
     saveFinalScore()
+  }
+
+  const skipSet = () => {
+    if(!allowSkip){
+      return
+    }
+
+    setTruth('none')
+    setAnimation(false)
+    setMoveCounter(0)
+    setData(numberGen(difficulty.data, difficulty.diffMode.level))
   }
 
   function setBlue(){
@@ -528,11 +548,12 @@ export const Gamepage = () => {
         
         <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
             
-            <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled} startIcon={<MoveCounterIcon moveCounter={moveCounter} level={difficulty.diffMode.level}/>}>Next</Button>
-            <Button variant="outlined" color="secondary" onClick={eventSolution} disabled={btnSolDisabled}>Solution</Button>
+          <Button variant="outlined" size="large" color="secondary" onClick={nextSet} disabled={btnNxtDisabled} startIcon={<MoveCounterIcon moveCounter={moveCounter} level={difficulty.diffMode.level} unlimitedMoves={unlimitedMoves}/>}>Next</Button>
+          {!isSpeedMode && <Button variant="outlined" color="secondary" onClick={eventSolution} disabled={btnSolDisabled}>Solution</Button>}
+          {allowSkip && <Button variant="outlined" color="secondary" onClick={skipSet}>Skip</Button>}
         </Stack>}
 
-        {btnSolDisabled && 
+        {btnSolDisabled && !isSpeedMode &&
 
           <Stack display='flex' justifyContent='center' direction='row' spacing={{xs: 15, sm: 20, md: 25, lg: 15}} sx={{marginTop: '0px'}}>
 

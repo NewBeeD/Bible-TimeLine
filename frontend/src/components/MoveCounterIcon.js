@@ -1,8 +1,8 @@
 import { Typography } from "@mui/material"
 
-export const MoveCounterIcon = ({moveCounter, level}) => {
+export const MoveCounterIcon = ({moveCounter, level, unlimitedMoves = false}) => {
   return (
-    <Typography>{level - moveCounter}</Typography>
+    <Typography>{unlimitedMoves ? '∞' : level - moveCounter}</Typography>
   )
   
 }

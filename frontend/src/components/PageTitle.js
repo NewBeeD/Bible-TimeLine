@@ -1,19 +1,21 @@
-import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider } from '@mui/material'
+import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Paper, Chip } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
 // import { localStorageData } from "../modules/localStorageData"
 import { FindHighScore } from '../modules/FindHighScore'
+import { GAME_TYPES } from '../modules/gameModes'
+import { createBlankScores, normalizeUserScores } from '../modules/scoreSchema'
 
 
 // Firebase Support
 import { auth, db } from '../firebaseAuth/firebaseSDK'
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
 import { signOut } from 'firebase/auth'
-import {set, ref, onValue} from 'firebase/database'
+import { set, ref, onValue, update } from 'firebase/database'
 
-const blankScores = {OT: {easy: 0, medium: 0, hard: 0}, NT: {easy: 0, medium: 0, hard: 0}, MX : {easy: 0, medium: 0, hard: 0}}
+const blankScores = createBlankScores()
 
 
 export const PageTitle = () => {
@@ -22,6 +24,7 @@ export const PageTitle = () => {
   const { dispatch } = useTimeLineContext()
   const navigate = useNavigate()
   const [mode, setMode] = useState({level: 4, time: 30})
+  const [gameType, setGameType] = useState(GAME_TYPES.CLASSIC)
   const [highScore, setHighScore] = useState()
   const [showSigninBtn, setShowSignInBtn] = useState(true)
   const [name, setName] = useState('')
@@ -54,7 +57,16 @@ export const PageTitle = () => {
   
   
   const startGame = () => {
-    navigate('/game', { state: { data: active, diffMode: mode } })
+    if(gameType === GAME_TYPES.PVP){
+      navigate('/pvp/create', { state: { data: active, diffMode: mode, gameType } })
+      return
+    }
+
+    navigate('/game', { state: { data: active, diffMode: mode, gameType } })
+  }
+
+  const joinPvpGame = () => {
+    navigate('/pvp/join')
   }
 
   useEffect(()=>{
@@ -90,11 +102,15 @@ export const PageTitle = () => {
           })
 
 
-            setHighScore(FindHighScore(active, mode, blankScores))
+            setHighScore(FindHighScore(active, mode, blankScores, gameType))
           }
           else{
-            dispatch({type: 'SET_DATA', payload: userHighScores})
-            setHighScore(FindHighScore(active, mode, userHighScores))
+            const normalizedScores = normalizeUserScores(userHighScores)
+            dispatch({type: 'SET_DATA', payload: normalizedScores})
+            setHighScore(FindHighScore(active, mode, normalizedScores, gameType))
+
+            update(ref(db, 'users/' + user.uid + '/data'), normalizedScores)
+              .catch((error) => console.log(error))
           }
           
         })
@@ -102,7 +118,7 @@ export const PageTitle = () => {
       else{
         
         setShowSignInBtn(true)
-        setHighScore(FindHighScore(active, mode, blankScores))
+        setHighScore(FindHighScore(active, mode, blankScores, gameType))
       }
     })
 
@@ -111,7 +127,7 @@ export const PageTitle = () => {
       unsubscribeAuth()
     }
 
-  }, [active, mode, dispatch])
+  }, [active, mode, dispatch, gameType])
  
   
   return (
@@ -121,90 +137,106 @@ export const PageTitle = () => {
     justifyContent="center"
     alignItems="center"
     minHeight="inherit"
+    py={{ xs: 3, sm: 5 }}
+    px={2}
     >
 
-      <Box
-      display='flex'
-      flexDirection='column'
-      spacing={8}>
+      <Paper
+        elevation={10}
+        sx={{
+          width: '100%',
+          maxWidth: 820,
+          borderRadius: 4,
+          p: { xs: 2.2, sm: 3.2 },
+          backgroundColor: 'rgba(11, 12, 16, 0.88)',
+          border: '1px solid rgba(255,255,255,0.12)'
+        }}
+      >
+        <Stack spacing={2.4}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }}>
+            <Box>
+              <Typography component='h1' sx={{ typography: { sm: 'h3', xs: 'h4' }, color: 'white', fontWeight: 700 }}>
+                Bible TimeLine
+              </Typography>
+              <Typography sx={{ color: 'grey.300' }}>
+                Pick a category, difficulty and mode to start.
+              </Typography>
+            </Box>
+            {!showSigninBtn && <Chip label={`Welcome ${name || 'Player'}`} color='secondary' sx={{ color: 'white' }} />}
+          </Stack>
 
-        <Box>
-          <Typography component='h1' color='#c5c6c7' sx={{typography: {sm: 'h1', xs: 'h3'}, textAlign: 'center', marginX: '14px'}}>
-            Bible TimeLine
-          </Typography>
-        </Box>
+          <Box>
+            <HighscoreDisplay highscore={highScore}/>
+          </Box>
 
-        {/* Highscore display for each mode click */}
+          {!showSigninBtn &&
+            <Stack direction='row' spacing={1.2}>
+              <Link to='/leaderboard' style={{textDecoration: 'none', width: '100%'}}>
+                <Button variant='contained' fullWidth>
+                  <Typography sx={{ color: 'white', letterSpacing: 1.2}}>Open Leaderboard</Typography>
+                </Button>
+              </Link>
+            </Stack>
+          }
 
-        <Box marginTop={{xs: 4, sm: 10, lg: 6}}>
-          
-          <HighscoreDisplay highscore={highScore}/>
-
-        </Box>
-
-
-        {/* Leaderboard Button display on successful login */}
-
-        {!showSigninBtn && <Stack margin='auto' marginTop={2}>
-            <Link to='/leaderboard'>
-              <Button variant='contained'>
-                <Typography sx={{ color: 'white', letterSpacing: 2}}>LeaderBoard</Typography>
+          <Stack spacing={1.2}>
+            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Category</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
+              <Button variant={active === 1 ? 'contained' : 'outlined'} onClick={() => setActive(1)} fullWidth>
+                <Typography sx={{color: 'white', fontWeight: 'bold'}}>Old Testament</Typography>
               </Button>
-            </Link>
-          </Stack>}
+              <Button variant={active === 2 ? 'contained' : 'outlined'} onClick={() => setActive(2)} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>New Testament</Typography>
+              </Button>
+              <Button variant={active === 3 ? 'contained' : 'outlined'} onClick={() => setActive(3)} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Mixed</Typography>
+              </Button>
+            </Stack>
+          </Stack>
 
+          <Stack spacing={1.2}>
+            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Difficulty</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
+              <Button variant={mode.level === 4 ? 'contained' : 'outlined'} onClick={() => setMode({level: 4, time:30})} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Easy</Typography>
+              </Button>
+              <Button variant={mode.level === 5 ? 'contained' : 'outlined'} onClick={() => setMode({level: 5, time:40})} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Medium</Typography>
+              </Button>
+              <Button variant={mode.level === 6 ? 'contained' : 'outlined'} onClick={() => setMode({level: 6, time:50})} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Hard</Typography>
+              </Button>
+            </Stack>
+          </Stack>
 
-        <Stack justifyContent='center' spacing={2} sx={{marginTop: {xs: '60px', sm: '70px', lg: '80px'}, marginX: '14px'}}>
+          <Stack spacing={1.2}>
+            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Game Mode</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
+              <Button variant={gameType === GAME_TYPES.CLASSIC ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.CLASSIC)} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Classic</Typography>
+              </Button>
+              <Button variant={gameType === GAME_TYPES.SPEED ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.SPEED)} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Speed</Typography>
+              </Button>
+              <Button variant={gameType === GAME_TYPES.PVP ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.PVP)} fullWidth>
+                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>PvP</Typography>
+              </Button>
+            </Stack>
+          </Stack>
 
-          <Button variant='outlined' onClick={() => setActive(1)}><Typography sx={{color: (active === 1? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Old Testament</Typography></Button>
-
-          <Button variant='outlined' onClick={() => setActive(2)} ><Typography variant='body1' sx={{color: (active === 2? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>New Testament</Typography></Button>
-
-          <Button variant='outlined' onClick={() => setActive(3)} ><Typography variant='body1' sx={{color: (active === 3? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '7px', md: '8px', lg: '9px'}}}>Mixed</Typography></Button>
-
-          {/* <TextField
-          variant='outlined'
-          label="Your Choice"
-          select
-          value={choice}
-          onChange={handleChange}
-          sx={{width: '170px', input: { color: 'red' }}}>
-
-            <MenuItem value='STORY'>Stories</MenuItem>
-            <MenuItem value='CHARACTER'>Characters</MenuItem>
-            <MenuItem value='BOOKS'>Books</MenuItem>
-
-          </TextField> */}
-
-
-         
-        </Stack>
-
-        <Stack 
-        direction='row' 
-        justifyContent='center' 
-        marginTop={{xs: 4, sm: 10, lg: 7}}
-        spacing={{xs: 2, sm: 5, lg: 6}}
-        >
-          <Button variant='outlined' onClick={() => setMode({level: 4, time:30})}><Typography variant='body1' sx={{color: (mode.level === 4? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Easy</Typography></Button>
-
-          <Button variant='outlined' onClick={() => setMode({level: 5, time:40})} ><Typography variant='body1' sx={{color: (mode.level === 5? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Medium</Typography></Button>
-
-          <Button variant='outlined' onClick={() => setMode({level: 6, time:50})} ><Typography variant='body1' sx={{color: (mode.level === 6? '#1976d2': 'white'), fontWeight: 'bold', letterSpacing: {xs:'2px', sm: '5px', md: '4px', lg: '5px'}}}>Hard</Typography></Button>
-        </Stack>
-
-
-        <Stack direction='row' justifyContent='center' spacing={2} sx={{marginTop: '40px'}}>
-          {/* <Button variant='outlined' size='large'>Easy</Button>
-          <Button variant='outlined' size='large'>Medium</Button>
-          <Button variant='outlined' size='large'>Hard</Button> */}
-          <Button variant='outlined' onClick={() => setHowToPlayOpen(true)}><Typography sx={{color: 'white'}}>How to Play</Typography></Button>
-          <Button variant='contained' onClick={startGame} disabled={showSigninBtn}><Typography variant='h4' sx={{color: 'white'}}>START</Typography></Button>
-        </Stack>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
+            <Button variant='outlined' fullWidth onClick={() => setHowToPlayOpen(true)}><Typography sx={{color: 'white'}}>How to Play</Typography></Button>
+            <Button variant='contained' fullWidth onClick={startGame} disabled={showSigninBtn}><Typography variant='h6' sx={{color: 'white'}}>{gameType === GAME_TYPES.PVP ? 'Create Match' : 'Start Game'}</Typography></Button>
+            {gameType === GAME_TYPES.PVP &&
+              <Button variant='contained' color='secondary' fullWidth onClick={joinPvpGame} disabled={showSigninBtn}>
+                <Typography sx={{color: 'white'}}>Join Match</Typography>
+              </Button>
+            }
+          </Stack>
 
         <Dialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)}>
           <DialogTitle><Typography variant='h5'>How to Play</Typography></DialogTitle>
-          <DialogTitle><Typography variant='body1'>Find the order of events in {mode.level} moves</Typography></DialogTitle>
+          <DialogTitle><Typography variant='body1'>{gameType === GAME_TYPES.SPEED ? `Get as many correct sets as possible in ${mode.time} seconds with unlimited moves.` : gameType === GAME_TYPES.PVP ? 'Compete with other players over six rounds (3 easy, 2 medium, 1 hard).' : `Find the order of events in ${mode.level} moves`}</Typography></DialogTitle>
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
@@ -227,25 +259,20 @@ export const PageTitle = () => {
         </Stack>
         }
 
-        <Stack marginTop={2} spacing={1} sx={{ marginX: '120px'}}>
+        <Stack marginTop={1} spacing={1}>
 
           {/* <Button variant='contained'><Typography sx={{ color: 'white'}}>SignIn</Typography></Button> */}
 
-          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle}><Typography sx={{ color: 'white', letterSpacing: 2}}>SignIn with Google</Typography></Button>)}
+          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle}><Typography sx={{ color: 'white', letterSpacing: 2}}>Sign In with Google</Typography></Button>)}
 
         </Stack>
 
-        {!showSigninBtn && 
-        <Stack margin='auto' marginTop={4}>
-          <Typography sx={{ color: 'white', letterSpacing: 2, textTransform: 'capitalize'}}>Welcome {name}!</Typography>
-        </Stack>
-        }
-
-        {!showSigninBtn && <Stack margin='auto' marginTop={2}>
-          <button variant='outlined' onClick={signOutUser}><Typography sx={{ letterSpacing: 1, padding: '2px', cursor: 'pointer'}}>Logout</Typography></button>
+        {!showSigninBtn && <Stack marginTop={1}>
+          <Button variant='outlined' color='inherit' onClick={signOutUser}><Typography sx={{ letterSpacing: 1, color: 'white'}}>Logout</Typography></Button>
         </Stack>}
 
-      </Box>
+      </Stack>
+      </Paper>
 
 
 
