@@ -1,6 +1,3 @@
-import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "./tempCookie";
-
-
 export const FindHighScore = (active, mode, userHighScores) => {
 
 
@@ -47,6 +44,10 @@ export const FindHighScore = (active, mode, userHighScores) => {
   }
 
 
+
+  if(!gameCategory || !gameDifficulty){
+    return 0
+  }
 
   return userHighScores[gameCategory][gameDifficulty];  
   // return 4;  

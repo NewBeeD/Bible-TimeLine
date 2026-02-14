@@ -14,15 +14,15 @@ export const numberGen = (oldOrNewTestament, difficultySettings) => {
 
   if(oldOrNewTestament === 1){
     start_point = 0;
-    end_point = 472;
+    end_point = oldTestamentEvents.length - 1;
   }
   else if( oldOrNewTestament === 2){
     start_point = 0;
-    end_point = 110;
+    end_point = newTestamentEvents.length - 1;
   }
   else{
     start_point = 0;
-    end_point = 582;
+    end_point = allData.length - 1;
   }
 
 
@@ -32,7 +32,10 @@ export const numberGen = (oldOrNewTestament, difficultySettings) => {
 
   function arrGen(){
 
-    for(let i = 0; i < difficultySettings; i++){
+    const maxUnique = end_point - start_point + 1
+    const targetLength = Math.min(difficultySettings, maxUnique)
+
+    while(list.length < targetLength){
 
       let randomNum = randomIntFromInterval(start_point, end_point)
 
@@ -50,15 +53,21 @@ export const numberGen = (oldOrNewTestament, difficultySettings) => {
 
       switch(oldOrNewTestament){
         case 1:
-          events.push(oldTestamentEvents[arr[i]])
+          if(oldTestamentEvents[arr[i]]){
+            events.push(oldTestamentEvents[arr[i]])
+          }
           break;
         
         case 2:
-          events.push(newTestamentEvents[arr[i]])
+          if(newTestamentEvents[arr[i]]){
+            events.push(newTestamentEvents[arr[i]])
+          }
           break;
         
         default:
-          events.push(allData[arr[i]])
+          if(allData[arr[i]]){
+            events.push(allData[arr[i]])
+          }
           break;
       }
 

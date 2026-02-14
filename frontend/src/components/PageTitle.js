@@ -1,5 +1,5 @@
-import { Typography, Box, Stack, Grid, Button, MenuItem, Select, TextField, Divider } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider } from '@mui/material'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
@@ -19,13 +19,13 @@ const blankScores = {OT: {easy: 0, medium: 0, hard: 0}, NT: {easy: 0, medium: 0,
 export const PageTitle = () => {
 
   const [active, setActive] = useState(2)
-
-  const [choice, setChoice] = useState('')
-  const {contextData, dispatch} = useTimeLineContext()
+  const { dispatch } = useTimeLineContext()
+  const navigate = useNavigate()
   const [mode, setMode] = useState({level: 4, time: 30})
   const [highScore, setHighScore] = useState()
   const [showSigninBtn, setShowSignInBtn] = useState(true)
   const [name, setName] = useState('')
+  const [howToPlayOpen, setHowToPlayOpen] = useState(false)
 
 
 
@@ -36,10 +36,8 @@ export const PageTitle = () => {
   const signinWithGoogle = () => {
 
     signInWithPopup(auth, provider)
-    .then((results) => {
-
+    .then(() => {
       setShowSignInBtn(false)
-      console.log(results);
     })
     .catch((error) => console.log(error))
   }
@@ -47,10 +45,7 @@ export const PageTitle = () => {
 
   const signOutUser = () => {
 
-    console.log('In signout function');
-
     signOut(auth).then(() => {
-      console.log('Signout Successful');
       setShowSignInBtn(true)
     }).catch((err) => console.log(err))
   }
@@ -58,22 +53,15 @@ export const PageTitle = () => {
   
   
   
-  const setCategory = () => {
-
-    let dataPoint = {category: 'category', data: active, diffMode: mode}
-    let valueString = JSON.stringify(dataPoint)
-    localStorage.setItem('data', valueString)
+  const startGame = () => {
+    navigate('/game', { state: { data: active, diffMode: mode } })
   }
-
-
-  const handleChange = (e) => {
-    setChoice(e.target.value)
-  }
-
 
   useEffect(()=>{
 
-    onAuthStateChanged(auth, (user) => {
+    let unsubscribeUserData = () => {}
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
 
       if(user){
         setShowSignInBtn(false)
@@ -81,7 +69,7 @@ export const PageTitle = () => {
   
         const userData = ref(db, 'users/' + user.uid + '/data')
 
-        onValue(userData, (snapshot) => {
+        unsubscribeUserData = onValue(userData, (snapshot) => {
 
           const userHighScores = snapshot.val()
           
@@ -118,11 +106,12 @@ export const PageTitle = () => {
       }
     })
 
-    // if(document.cookie){setHighScore(FindHighScore(active, mode, userHighScores))}
+    return () => {
+      unsubscribeUserData()
+      unsubscribeAuth()
+    }
 
-    // else {setHighScore(0)}
-    
-  }, [active, mode])
+  }, [active, mode, dispatch])
  
   
   return (
@@ -209,12 +198,34 @@ export const PageTitle = () => {
           {/* <Button variant='outlined' size='large'>Easy</Button>
           <Button variant='outlined' size='large'>Medium</Button>
           <Button variant='outlined' size='large'>Hard</Button> */}
-          <Link to='/game' style={{ textDecoration: 'none', color: 'red'}}>
-           
-              <Button variant='contained' onClick={setCategory}><Typography variant='h4' sx={{color: 'white'}}>START</Typography></Button>
-        
-            </Link>
+          <Button variant='outlined' onClick={() => setHowToPlayOpen(true)}><Typography sx={{color: 'white'}}>How to Play</Typography></Button>
+          <Button variant='contained' onClick={startGame} disabled={showSigninBtn}><Typography variant='h4' sx={{color: 'white'}}>START</Typography></Button>
         </Stack>
+
+        <Dialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)}>
+          <DialogTitle><Typography variant='h5'>How to Play</Typography></DialogTitle>
+          <DialogTitle><Typography variant='body1'>Find the order of events in {mode.level} moves</Typography></DialogTitle>
+
+          <DialogContent>
+            <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>Click next if you are confident in your order of events.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If it shows red, that means your order is not correct, so try again.</DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+            <DialogContentText>If you are unable to solve, then click solution to see the answer.</DialogContentText>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setHowToPlayOpen(false)}>OK</Button>
+          </DialogActions>
+        </Dialog>
+
+        {showSigninBtn && 
+        <Stack marginTop={1}>
+          <Typography sx={{ color: 'white', textAlign: 'center' }}>Sign in to save scores to leaderboard</Typography>
+        </Stack>
+        }
 
         <Stack marginTop={2} spacing={1} sx={{ marginX: '120px'}}>
 

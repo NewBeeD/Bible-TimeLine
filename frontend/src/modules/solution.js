@@ -1,15 +1,9 @@
 
 
 export const solution = (order, events) => {
-
-  let eventSolution = [];
-
-  for (let x = 0; x < events.length; x++) {
-    
-    let index = events.findIndex(object => {return object.id === order[x]})
-
-    eventSolution.push(events[index])    
-  }
+  const eventSolution = [...events]
+    .filter((eventItem) => eventItem && typeof eventItem.id !== 'undefined')
+    .sort((first, second) => first.id - second.id)
 
   return eventSolution
 }

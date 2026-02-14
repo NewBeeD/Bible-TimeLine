@@ -1,5 +1,3 @@
-import { useState } from "react"
-
 export const sortDifficultyMode = (dataPoints, arrow, gameMode, difficultyMode) => {
 
   // ascending

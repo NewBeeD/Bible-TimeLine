@@ -12,7 +12,7 @@ export const userDataReducer = (state, action) =>{
       }
           
     default:
-      break;
+      return state;
 
   }
 

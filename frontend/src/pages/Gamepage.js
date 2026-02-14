@@ -1,22 +1,22 @@
-import { Box, Typography, Card, List, ListItem, ListItemAvatar, ListItemText, Paper, Container, Avatar, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider, Switch } from "@mui/material"
+import { Box, Typography, List, ListItem, ListItemText, Paper, Container, Stack, Button, AppBar, Toolbar, Drawer, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider, Switch, Snackbar } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
 import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import { numberGen } from "../modules/numberGen"
-import { Link } from "react-router-dom"
-import { useTimeLineContext } from "../hooks/useTimeLineContext"
+import { Link, Navigate, useLocation } from "react-router-dom"
 import { eventsCheck } from '../modules/eventsOrderFinder'
 import { orderChecker } from "../modules/orderChecker"
 import { solution } from "../modules/solution"
-import { setCookie, getCookie, deleteCookie, updateCookie, firstCookie } from "../modules/tempCookie";
+import { upsertPlayerScore } from "../modules/firebaseScores";
 import { MoveCounterIcon } from "../components/MoveCounterIcon";
+import { auth } from "../firebaseAuth/firebaseSDK";
+import { onAuthStateChanged } from "firebase/auth";
 
 
 
 import ReactCountdownClock from 'react-countdown-clock'
-import CountDownTimer from "../components/CountDownTimer";
 // import { useWindowSize } from "@uidotdev/usehooks";
 // import breakPoint from "../modules/BreakPointCalculator";
 
@@ -29,63 +29,60 @@ export const Gamepage = () => {
 
   // const {difficulty, dispatch} = useTimeLineContext()
 
-  const difficulty = JSON.parse(localStorage.getItem('data'));
+  const location = useLocation()
+  const storedDifficulty = location.state
+  const shouldRedirect = !storedDifficulty || !storedDifficulty.diffMode
+  const difficulty = shouldRedirect ? {data: 2, diffMode: {level: 4, time: 30}} : storedDifficulty
 
  
   const [data, setData] = useState(numberGen(difficulty.data, difficulty.diffMode.level))
   const [truth, setTruth] = useState('')
   const [animation, setAnimation] = useState(null)
-  const counterVal = useRef()
   const [btnNxtDisabled, setBtnNxtDisabled] = useState(false)
   const [btnSolDisabled, setBtnSolDisabled] = useState(false)
-  const [btnDisabled, setBtnDisabled] = useState(false)
 
   const [score, setScore] = useState(0)
-  const [showScore, setShowScore] = useState(true)
+  const showScore = true
 
   // const [countdown, setCountDown] = useState(() => <CountDownTimer />)
   
   const [counter, setCounter] = useState(difficulty.diffMode.time)
   const [isDrawerOPen, setIsDrawerOpen] = useState(false)
-  const [value, setValue] = useState(0);
   const [timer, setTimer] = useState(false)
-  const [open, setOpen] = useState(true)
-  const [moveCounter, setMoveCounter] = useState(1)
+  const [open, setOpen] = useState(false)
+  const [moveCounter, setMoveCounter] = useState(0)
   const [blankTimer, setBlankTimer] = useState(false)
-  const [modal, setModal] = useState(true)
+  const [authReady, setAuthReady] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [scoreSavedOpen, setScoreSavedOpen] = useState(false)
+  const [scoreSaveErrorOpen, setScoreSaveErrorOpen] = useState(false)
+
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(Boolean(user))
+      setAuthReady(true)
+    })
+
+    return () => unsubscribeAuth()
+  }, [])
 
 
-  const moveCounterFunction = () =>{
+  const moveCounterFunction = (currentMoveCounter) =>{
 
 
     let gameMode = difficulty.diffMode.level
 
-    if(moveCounter > parseInt(gameMode, 10)){
-
-      if(modal === true){
-        firstCookie(difficulty, score)
-      }
-      else{
-        updateCookie(difficulty, score)
-      }
+    if(currentMoveCounter > parseInt(gameMode, 10)){
+      upsertPlayerScore(difficulty, score)
       
       setBtnNxtDisabled(true) 
       setBlankTimer(true)
-      setMoveCounter(1)}
+      setMoveCounter(0)}
   }
 
   
 
 
-  const closeDialogStartTimer = () => {
-    setOpen(false);
-  }
-
-  const handleChange = (event) => {
-    setValue(parseInt(event.target.value, 10));
-    numberGen(difficulty.data, value)
-  };
-  
   // random number added to the counter so as to render on every problem set
   const randomNum = (boolData) => {
 
@@ -97,8 +94,6 @@ export const Gamepage = () => {
     setTimer(event.target.checked);
   }
   
-
-  let newList = [];
 
   // Returns the correct order of the events
   let eventsOrder = eventsCheck(data)
@@ -118,10 +113,12 @@ export const Gamepage = () => {
         setScore(0)
       }
       else{
-        setScore((scr) => scr + 1)
+        const nextScore = score + 1
+        setScore(nextScore)
+        upsertPlayerScore(difficulty, nextScore)
       }
 
-      setMoveCounter(1)
+      setMoveCounter(0)
 
       setData(numberGen(difficulty.data, difficulty.diffMode.level))
       // setCounter(40 + randomNum(timer))
@@ -155,7 +152,7 @@ export const Gamepage = () => {
   const handleDragDrop = (result) => {
 
 
-    const {source, destination, type, index} = result
+    const {source, destination} = result
 
     setTruth('none')
     setAnimation(false)
@@ -170,17 +167,16 @@ export const Gamepage = () => {
     
     if(source.draggableId !== destination.droppableId && source.index !== destination.index){
 
-      setMoveCounter(() => moveCounter + 1)
+      const nextMoveCounter = moveCounter + 1
+      setMoveCounter(nextMoveCounter)
       setData(items)
-      moveCounterFunction()}
+      moveCounterFunction(nextMoveCounter)}
     // moveCounterFunction()
   }
 
-  // Removing Gamemode from local-storage 
+  // Returning to mode-selection page
   const changeCategory = () =>{
     // dispatch({type: 'SET_DIFFICULTY', payload: null})
-    // localStorage.clear()
-    localStorage.removeItem('data');
   }
 
   const eventSolution = () => {
@@ -188,57 +184,64 @@ export const Gamepage = () => {
     let solutionData = solution(eventsOrder, data) 
     setTruth('blue')
 
-
-    if(modal === true){
-      firstCookie(difficulty, score)
-    }
-    else{
-      updateCookie(difficulty, score)
-    }
-    
     setData(solutionData)
     setTimeout(setBlue, 1000)
     setBtnNxtDisabled(true)
-    setScore(score)
-    
-    
-    setTimeout(() => {setBtnSolDisabled(true); setBlankTimer(true)}, 300);
-    
+    setBtnSolDisabled(true)
+    setBlankTimer(true)
+
+    saveFinalScore()
   }
 
   function setBlue(){
     setTruth('none')
   }
 
-  
-  // Setting up temporary highscore data storage
-  useEffect(() => {
+  const saveFinalScore = async () => {
 
-    let data;
-
-    if(document.cookie){
-      setModal(false)
-      setOpen(false)
-    }
-  }, [])
-
-  const cookieFunction = () => {
-
-    setBtnNxtDisabled(true)
-
-    if(modal === true){
-      firstCookie(difficulty, score)
+    const didSave = await upsertPlayerScore(difficulty, score)
+    if(didSave){
+      setScoreSavedOpen(true)
+      setScoreSaveErrorOpen(false)
     }
     else{
-      updateCookie(difficulty, score)
+      setScoreSaveErrorOpen(true)
     }
+  }
 
-    setScore(score)
+  const handleScoreSavedClose = () => {
+    setScoreSavedOpen(false)
+  }
+
+  const handleScoreSaveErrorClose = () => {
+    setScoreSaveErrorOpen(false)
+  }
+
+  const saveScore = () => {
+
+    setBtnNxtDisabled(true)
+    setBtnSolDisabled(true)
+    setBlankTimer(true)
+
+    saveFinalScore()
     
   }
 
-  let order = eventsCheck(data)
+  if(shouldRedirect){
+    return <Navigate to='/' replace />
+  }
 
+  if(!authReady){
+    return (
+      <Box minHeight="100vh" display='flex' justifyContent='center' alignItems='center' className="gamePage">
+        <Typography variant='h6' sx={{ color: 'white' }}>Loading...</Typography>
+      </Box>
+    )
+  }
+
+  if(authReady && !isAuthenticated){
+    return <Navigate to='/' replace />
+  }
 
   if(open){
     return (
@@ -278,8 +281,7 @@ export const Gamepage = () => {
           </Toolbar>
         </AppBar>
 
-
-        {modal && <Dialog open={open} >
+    <Dialog open={open} >
 
           <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
           <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
@@ -299,7 +301,7 @@ export const Gamepage = () => {
             <Button onClick={() => setOpen(false)}>OK</Button>
           </DialogActions>
 
-        </Dialog>}
+        </Dialog>
 
       
         <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
@@ -344,6 +346,22 @@ export const Gamepage = () => {
   </DragDropContext>
 
         </Container>
+
+        <Snackbar
+          open={scoreSavedOpen}
+          autoHideDuration={1800}
+          onClose={handleScoreSavedClose}
+          message='Score saved'
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
+
+        <Snackbar
+          open={scoreSaveErrorOpen}
+          autoHideDuration={2200}
+          onClose={handleScoreSaveErrorClose}
+          message='Could not save score'
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
 
       </div>
     )
@@ -439,7 +457,7 @@ export const Gamepage = () => {
                       color="#173174"
                       alpha={0.9}
                       size={150}
-                      onComplete={cookieFunction}
+                      onComplete={saveScore}
                       /> : <ReactCountdownClock 
                       seconds={0}
                       color="#090"
@@ -529,6 +547,22 @@ export const Gamepage = () => {
 
           </Stack>
         }
+
+        <Snackbar
+          open={scoreSavedOpen}
+          autoHideDuration={1800}
+          onClose={handleScoreSavedClose}
+          message='Score saved'
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
+
+        <Snackbar
+          open={scoreSaveErrorOpen}
+          autoHideDuration={2200}
+          onClose={handleScoreSaveErrorClose}
+          message='Could not save score'
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
   
         
   
