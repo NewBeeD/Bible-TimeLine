@@ -6,12 +6,18 @@ This app is configured to run as a single Render **Web Service**:
 - Node + Socket.IO server runs from `server`
 - Node server serves `frontend/build` + SPA fallback
 
-## Option A (recommended): Blueprint deploy with `render.yaml`
+## Option A (recommended): Manual Web Service deploy
 
-1. Push this repo to GitHub (including `render.yaml`).
-2. In Render, click **New** -> **Blueprint**.
-3. Select this repository and deploy.
-4. In the service env vars, set these secrets:
+1. Push this repo to GitHub.
+2. In Render, click **New** -> **Web Service**.
+3. Connect this repository.
+4. Use these service settings:
+   - Runtime: `Node`
+   - Root Directory: `.`
+   - Build Command: `cd frontend && npm install && npm run build && cd ../server && npm install`
+   - Start Command: `cd server && npm start`
+   - Health Check Path: `/health`
+5. In the service env vars, set these secrets:
    - `REACT_APP_FIREBASE_API_KEY`
    - `REACT_APP_FIREBASE_AUTH_DOMAIN`
    - `REACT_APP_FIREBASE_PROJECT_ID`
@@ -19,25 +25,12 @@ This app is configured to run as a single Render **Web Service**:
    - `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
    - `REACT_APP_FIREBASE_APP_ID`
    - `REACT_APP_FIREBASE_MEASUREMENT_ID` (optional if unused)
+   - `NODE_VERSION=20`
+   - `NODE_ENV=production`
 
-`render.yaml` already sets:
+## Option B: Blueprint deploy (optional)
 
-- Build: `cd frontend && npm install && npm run build && cd ../server && npm install`
-- Start: `cd server && npm start`
-- Health check path: `/health`
-- `NODE_VERSION=20`, `NODE_ENV=production`
-
-## Option B: Manual Web Service setup
-
-If you don't want Blueprint, create **New -> Web Service** and use:
-
-- Runtime: `Node`
-- Root Directory: `.`
-- Build Command: `cd frontend && npm install && npm run build && cd ../server && npm install`
-- Start Command: `cd server && npm start`
-- Health Check Path: `/health`
-
-Then add the same Firebase env vars listed above.
+If you later prefer Blueprint, this repo includes `render.yaml` with the same commands.
 
 ## Verify after deploy
 
