@@ -236,16 +236,44 @@ export const PageTitle = () => {
 
         <Dialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)}>
           <DialogTitle><Typography variant='h5'>How to Play</Typography></DialogTitle>
-          <DialogTitle><Typography variant='body1'>{gameType === GAME_TYPES.SPEED ? `Get as many correct sets as possible in ${mode.time} seconds with unlimited moves.` : gameType === GAME_TYPES.PVP ? 'Compete with other players over six rounds (3 easy, 2 medium, 1 hard).' : `Find the order of events in ${mode.level} moves`}</Typography></DialogTitle>
+          <DialogTitle>
+            <Typography variant='body1'>Current selection: {gameType === GAME_TYPES.PVP ? 'PvP' : gameType === GAME_TYPES.SPEED ? 'Speed' : 'Classic'}</Typography>
+          </DialogTitle>
 
           <DialogContent>
-            <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>
+            <DialogContentText>
+              Core objective: drag and drop Bible events into the correct chronological order.
+            </DialogContentText>
             <Divider sx={{marginY: '10px'}}/>
-            <DialogContentText>Click next if you are confident in your order of events.</DialogContentText>
+
+            <DialogContentText>
+              Classic Mode: solve one ordering puzzle. Difficulty controls puzzle size (Easy 4, Medium 5, Hard 6 events).
+            </DialogContentText>
             <Divider sx={{marginY: '10px'}}/>
-            <DialogContentText>If it shows red, that means your order is not correct, so try again.</DialogContentText>
+
+            <DialogContentText>
+              Speed Mode: solve as many puzzles as possible before the timer ends. Unlimited attempts during the timer.
+            </DialogContentText>
             <Divider sx={{marginY: '10px'}}/>
-            <DialogContentText>If you are unable to solve, then click solution to see the answer.</DialogContentText>
+
+            <DialogContentText>
+              PvP Classic: players share the same round puzzle, submit once per round, and round points are shown on the leaderboard.
+            </DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+
+            <DialogContentText>
+              PvP Race (3 Orders): each round has 3 shared problems. Players can retry each problem unlimited times. Each correctly completed problem gives 1 point. First player to complete all 3 ends the round for everyone.
+            </DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+
+            <DialogContentText>
+              PvP rounds are timed. If time runs out, the round closes for all players and points are calculated from completed answers.
+            </DialogContentText>
+            <Divider sx={{marginY: '10px'}}/>
+
+            <DialogContentText>
+              At match end, total points across rounds decide the final leaderboard and podium (top 3 players).
+            </DialogContentText>
           </DialogContent>
 
           <DialogActions>

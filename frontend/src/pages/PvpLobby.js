@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Avatar, Box, Button, Chip, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, Stack, Typography } from '@mui/material'
 import { getPvpSocket } from '../modules/pvpSocket'
 import { PvpConnectionBadge } from '../components/PvpConnectionBadge'
+import { PVP_MODES } from '../modules/gameModes'
+
+const AVATARS = ['🕺', '💃', '🦊', '🦄', '🐼', '🦉', '🐯', '🐸', '🐬', '🐙']
 
 export const PvpLobby = () => {
   const location = useLocation()
@@ -17,18 +20,24 @@ export const PvpLobby = () => {
 
   const amHost = room?.hostPlayerId === playerId
 
+  const avatarForUser = (seed = '') => {
+    if(!seed){
+      return AVATARS[0]
+    }
+
+    let hash = 0
+    for(let index = 0; index < seed.length; index += 1){
+      hash = ((hash << 5) - hash) + seed.charCodeAt(index)
+      hash |= 0
+    }
+
+    return AVATARS[Math.abs(hash) % AVATARS.length]
+  }
+
   const buildFallbackColor = (seed = '') => {
     const palette = ['#2563eb', '#7c3aed', '#0891b2', '#16a34a', '#db2777', '#f59e0b', '#ea580c']
     const index = Math.abs(seed.split('').reduce((total, char) => total + char.charCodeAt(0), 0)) % palette.length
     return palette[index]
-  }
-
-  const buildAvatarLabel = (name = '') => {
-    const trimmed = name.trim()
-    if(!trimmed){
-      return 'P'
-    }
-    return trimmed[0].toUpperCase()
   }
 
   useEffect(() => {
@@ -98,12 +107,22 @@ export const PvpLobby = () => {
     setConfirmExitOpen(true)
   }
 
+  const copyCode = async () => {
+    try{
+      await navigator.clipboard.writeText(roomCode || '')
+    }
+    catch(error){
+      setError('Could not copy room code')
+    }
+  }
+
   return (
     <Box
       minHeight='100vh'
       sx={{
-        background: 'linear-gradient(135deg, #173174 0%, #1f2833 45%, #0b0c10 100%)',
-        py: { xs: 3, sm: 6 }
+        background: 'radial-gradient(circle at top, #06b6d4 0%, #4f46e5 40%, #0f172a 100%)',
+        py: { xs: 3, sm: 6 },
+        px: { xs: 1.5, sm: 2.5 }
       }}
     >
       <Container maxWidth='md'>
@@ -112,20 +131,47 @@ export const PvpLobby = () => {
           sx={{
             p: { xs: 2.5, sm: 4 },
             borderRadius: 3,
-            backgroundColor: 'rgba(11, 12, 16, 0.88)',
-            border: '1px solid rgba(255,255,255,0.12)'
+            backgroundColor: 'rgba(255,255,255,0.10)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            backdropFilter: 'blur(10px)'
           }}
         >
           <Stack spacing={3}>
             <Stack direction='row' alignItems='center' justifyContent='space-between'>
-              <Typography variant='h5' sx={{ color: 'white', fontWeight: 700 }}>Lobby 👥</Typography>
+              <Typography variant='h5' sx={{ color: 'white', fontWeight: 800 }}>Waiting Room 👥</Typography>
               <PvpConnectionBadge />
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent='space-between'>
-              <Typography sx={{ color: 'grey.300' }}>Game code</Typography>
-              <Chip label={roomCode} color='secondary' sx={{ fontWeight: 700, letterSpacing: '0.15em', color: 'white' }} />
+              <Typography sx={{ color: 'grey.100', fontWeight: 700 }}>Game code</Typography>
+              <Chip
+                label={roomCode}
+                color='secondary'
+                sx={{
+                  fontWeight: 800,
+                  letterSpacing: '0.2em',
+                  color: 'white',
+                  fontSize: { xs: '1.05rem', sm: '1.2rem' },
+                  px: 1.2,
+                  py: 0.35
+                }}
+              />
             </Stack>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
+              <Button variant='outlined' onClick={copyCode} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.35)' }}>Copy Code</Button>
+            </Stack>
+
+            {room?.settings && (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                <Chip
+                  label={room.settings.pvpMode === PVP_MODES.RACE_THREE ? 'Mode: Race (3 Orders)' : 'Mode: Classic PvP'}
+                  color='default'
+                  sx={{ color: '#f3f4f6' }}
+                />
+                <Chip label={`Rounds: ${room.settings.roundPlan?.length || 0}`} color='default' sx={{ color: '#f3f4f6' }} />
+              </Stack>
+            )}
 
             {error && <Alert severity='error'>{error}</Alert>}
 
@@ -136,29 +182,37 @@ export const PvpLobby = () => {
                     elevation={0}
                     sx={{
                       p: 1.75,
-                      borderRadius: 2,
-                      border: '1px solid rgba(255,255,255,0.16)',
-                      backgroundColor: 'rgba(255,255,255,0.04)'
+                      borderRadius: 2.4,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      backgroundColor: 'rgba(255,255,255,0.10)',
+                      textAlign: 'center'
                     }}
                   >
-                    <Stack direction='row' spacing={1.5} alignItems='center'>
+                    <Stack spacing={1.1} alignItems='center'>
                       <Avatar
-                        src={player.avatar || ''}
+                        src={player.avatar || undefined}
                         alt={player.name}
                         sx={{
+                          width: 64,
+                          height: 64,
+                          fontSize: '2rem',
                           bgcolor: player.avatar ? 'transparent' : buildFallbackColor(player.playerId || player.name),
-                          animation: 'pvpAvatarFloat 2.1s ease-in-out infinite',
-                          '@keyframes pvpAvatarFloat': {
+                          animation: 'pvpAvatarBob 0.95s ease-in-out infinite alternate, pvpAvatarSway 1.2s ease-in-out infinite',
+                          '@keyframes pvpAvatarBob': {
                             '0%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-4px)' },
-                            '100%': { transform: 'translateY(0px)' }
+                            '100%': { transform: 'translateY(-7px)' }
+                          },
+                          '@keyframes pvpAvatarSway': {
+                            '0%': { rotate: '-4deg' },
+                            '50%': { rotate: '4deg' },
+                            '100%': { rotate: '-4deg' }
                           }
                         }}
                       >
-                        {!player.avatar && buildAvatarLabel(player.name)}
+                        {!player.avatar && avatarForUser(player.playerId || player.name || '')}
                       </Avatar>
-                      <Stack spacing={0.6}>
-                        <Typography sx={{ color: 'white', fontWeight: 600 }}>{player.name}</Typography>
+                      <Stack spacing={0.5} alignItems='center'>
+                        <Typography sx={{ color: 'white', fontWeight: 700 }}>{player.name}</Typography>
                         <Chip
                           size='small'
                           label={player.connected ? 'Connected' : 'Disconnected'}
@@ -173,8 +227,41 @@ export const PvpLobby = () => {
             </Grid>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              <Button variant='outlined' color='error' fullWidth onClick={handleExitClick}>Exit Game</Button>
-              {amHost && <Button variant='contained' fullWidth onClick={startMatch}>Start Match</Button>}
+              <Button
+                variant='outlined'
+                fullWidth
+                onClick={handleExitClick}
+                sx={{
+                  color: 'white',
+                  borderColor: 'rgba(255,255,255,0.35)',
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                  fontWeight: 700,
+                  '&:hover': {
+                    borderColor: 'rgba(255,255,255,0.55)',
+                    backgroundColor: 'rgba(255,255,255,0.18)'
+                  }
+                }}
+              >
+                Exit Game
+              </Button>
+              {amHost && (
+                <Button
+                  variant='contained'
+                  fullWidth
+                  onClick={startMatch}
+                  sx={{
+                    color: 'white',
+                    fontWeight: 800,
+                    background: 'linear-gradient(90deg, #d946ef, #06b6d4)',
+                    boxShadow: '0 10px 24px rgba(6, 182, 212, 0.35)',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #c026d3, #0891b2)'
+                    }
+                  }}
+                >
+                  Start Match
+                </Button>
+              )}
             </Stack>
 
             <Dialog open={confirmExitOpen} onClose={() => setConfirmExitOpen(false)}>

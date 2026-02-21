@@ -3,14 +3,30 @@ import { io } from 'socket.io-client'
 let socketInstance = null
 
 export const getPvpServerUrl = () => {
-  if(process.env.REACT_APP_PVP_SERVER_URL){
-    return process.env.REACT_APP_PVP_SERVER_URL
-  }
-
   if(typeof window !== 'undefined'){
     const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:'
     const hostname = window.location.hostname || 'localhost'
-    return `${protocol}//${hostname}:4000`
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0'
+    const hasExplicitPort = Boolean(window.location.port)
+    const isBackendPort = window.location.port === '4000'
+
+    if(isLocalhost && !isBackendPort){
+      return `${protocol}//${hostname}:4000`
+    }
+
+    if(process.env.REACT_APP_PVP_SERVER_URL){
+      return process.env.REACT_APP_PVP_SERVER_URL
+    }
+
+    if(hasExplicitPort && !isBackendPort){
+      return `${protocol}//${hostname}:4000`
+    }
+
+    return window.location.origin
+  }
+
+  if(process.env.REACT_APP_PVP_SERVER_URL){
+    return process.env.REACT_APP_PVP_SERVER_URL
   }
 
   return 'http://localhost:4000'
@@ -23,7 +39,7 @@ export const getPvpSocket = () => {
 
   const serverUrl = getPvpServerUrl()
   socketInstance = io(serverUrl, {
-    transports: ['websocket', 'polling'],
+    transports: ['polling', 'websocket'],
     autoConnect: true,
     timeout: 7000,
     reconnection: true,

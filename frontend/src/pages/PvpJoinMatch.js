@@ -57,8 +57,10 @@ export const PvpJoinMatch = () => {
     <Box
       minHeight='100vh'
       sx={{
-        background: 'linear-gradient(135deg, #173174 0%, #1f2833 45%, #0b0c10 100%)',
-        py: { xs: 4, sm: 7 }
+        background: 'radial-gradient(circle at top, #7c3aed 0%, #312e81 35%, #0f172a 100%)',
+        py: { xs: 4, sm: 7 },
+        px: { xs: 1.5, sm: 2.5 },
+        fontFamily: 'Inter, Segoe UI, Arial, Helvetica, sans-serif'
       }}
     >
       <Container maxWidth='sm'>
@@ -66,14 +68,15 @@ export const PvpJoinMatch = () => {
           elevation={8}
           sx={{
             p: { xs: 2.5, sm: 4 },
-            borderRadius: 3,
-            backgroundColor: 'rgba(11, 12, 16, 0.88)',
-            border: '1px solid rgba(255,255,255,0.12)'
+            borderRadius: 3.2,
+            backgroundColor: 'rgba(255,255,255,0.10)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            backdropFilter: 'blur(10px)'
           }}
         >
           <Stack spacing={3}>
             <Stack direction='row' alignItems='center' justifyContent='space-between'>
-              <Typography variant='h5' sx={{ color: 'white', fontWeight: 700 }}>Join PvP Match 🚀</Typography>
+              <Typography variant='h5' sx={{ color: 'white', fontWeight: 800, letterSpacing: '0.02em' }}>Join PvP Match 🚀</Typography>
               <PvpConnectionBadge />
             </Stack>
 

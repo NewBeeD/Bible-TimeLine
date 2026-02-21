@@ -2,7 +2,7 @@ import { Box, Typography, List, ListItem, ListItemText, Paper, Container, Stack,
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import '../App.css'
-import { DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable} from '@hello-pangea/dnd'
 import { useEffect, useState } from "react"
 import { numberGen } from "../modules/numberGen"
 import { Link, Navigate, useLocation } from "react-router-dom"
@@ -325,6 +325,9 @@ export const Gamepage = () => {
 
       
         <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+          <Typography sx={{ color: '#173174', fontSize: '0.86rem', marginBottom: 1 }}>
+            Mobile tip: press and hold an event, then drag to reorder.
+          </Typography>
   
   <DragDropContext onDragEnd={handleDragDrop}>
 
@@ -339,11 +342,11 @@ export const Gamepage = () => {
 
         {data && data.map((points, index)=> (
           
-          <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+          <Draggable key={points.id} draggableId={points.id.toString()} index={index} shouldRespectForcePress={false}>
 
           {(provided) => (
 
-            <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+            <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={provided.draggableProps.style} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none'), touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none'}} className={(animation? 'shake': '')}>
 
               <ListItem sx={{textAlign: "center"}} >
                 <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />
@@ -502,6 +505,9 @@ export const Gamepage = () => {
         
   
         <Container sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', minHeight: '300px'}}>
+          <Typography sx={{ color: '#173174', fontSize: '0.86rem', marginBottom: 1 }}>
+            Mobile tip: press and hold an event, then drag to reorder.
+          </Typography>
   
           <DragDropContext onDragEnd={handleDragDrop}>
   
@@ -516,11 +522,11 @@ export const Gamepage = () => {
   
                 {data && data.map((points, index)=> (
                   
-                  <Draggable key={points.id} draggableId={points.id.toString()} index={index}>
+                  <Draggable key={points.id} draggableId={points.id.toString()} index={index} shouldRespectForcePress={false}>
   
                   {(provided) => (
   
-                    <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none')}} className={(animation? 'shake': '')}>
+                    <Paper ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={provided.draggableProps.style} elevation={3} sx={{marginBottom: '20px', border: (truth === 'red'? '2px solid red': truth === 'blue'? '2px solid blue': 'none'), touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none'}} className={(animation? 'shake': '')}>
   
                       <ListItem sx={{textAlign: "center"}} >
                         <ListItemText  primary={points.event} primaryTypographyProps={{fontSize: {xs:'20px', sm:'25px', md: '28px'}}} />

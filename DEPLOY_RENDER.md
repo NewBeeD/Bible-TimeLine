@@ -1,44 +1,49 @@
-# Deploy to Render
+# Deploy to Render (Manual Web Service)
 
 ## 1) Push current branch to GitHub
 
 Render deploys from your GitHub repo, so first push your latest code.
 
-## 2) Create services from blueprint
+## 2) Create a Web Service (not Blueprint)
 
-1. Open Render Dashboard
-2. Click **New** -> **Blueprint**
-3. Select this repository
-4. Render will read `render.yaml` and propose:
-   - `bible-timeline-pvp-server` (Node web service)
-   - `bible-timeline-frontend` (Static site)
+1. Open Render Dashboard.
+2. Click New -> Web Service.
+3. Connect this repository.
+4. Use these settings:
+   - Name: bible-timeline
+   - Runtime: Node
+   - Root Directory: .
+   - Build Command: npm install --prefix frontend && npm install --prefix server && npm run build --prefix frontend
+   - Start Command: npm start --prefix server
 
 ## 3) Set environment variables
 
-In the **frontend static service**, set:
+In the bible-timeline web service, set:
 
-- `REACT_APP_PVP_SERVER_URL` = your backend service URL (e.g. `https://bible-timeline-pvp-server.onrender.com`)
-- `REACT_APP_FIREBASE_API_KEY`
-- `REACT_APP_FIREBASE_AUTH_DOMAIN`
-- `REACT_APP_FIREBASE_PROJECT_ID`
-- `REACT_APP_FIREBASE_STORAGE_BUCKET`
-- `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
-- `REACT_APP_FIREBASE_APP_ID`
-- `REACT_APP_FIREBASE_MEASUREMENT_ID`
+- NODE_VERSION = 20
+- NODE_ENV = production
+- REACT_APP_FIREBASE_API_KEY
+- REACT_APP_FIREBASE_AUTH_DOMAIN
+- REACT_APP_FIREBASE_PROJECT_ID
+- REACT_APP_FIREBASE_STORAGE_BUCKET
+- REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+- REACT_APP_FIREBASE_APP_ID
+- REACT_APP_FIREBASE_MEASUREMENT_ID
 
-## 4) Verify backend health
+## 4) Health check
+
+In Render service settings, set Health Check Path to:
+
+- /health
 
 After deploy, verify:
 
-- `https://<your-backend-host>/health`
+- https://<your-render-host>/health
 
-Should return JSON with `ok: true`.
-
-## 5) Rebuild frontend after backend URL changes
-
-If backend URL changes, update `REACT_APP_PVP_SERVER_URL` in Render and trigger a frontend redeploy.
+Expected response: {"ok":true}
 
 ## Notes
 
-- Frontend SPA routing is handled by `frontend/public/_redirects`.
-- WebSockets are supported on Render web services.
+- Frontend build output is served by the Node server from frontend/build.
+- SPA routing fallback is handled by the Node server (unknown routes return index.html).
+- WebSockets and HTTP are served from the same Render URL.

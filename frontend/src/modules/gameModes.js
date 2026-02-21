@@ -6,6 +6,16 @@ export const GAME_TYPES = {
 
 export const PVP_ROUND_PLAN = [4, 4, 4, 5, 5, 6]
 
+export const PVP_MODES = {
+  CLASSIC: 'classic',
+  RACE_THREE: 'race_three'
+}
+
+export const PVP_MODE_LABELS = {
+  [PVP_MODES.CLASSIC]: 'Classic PvP',
+  [PVP_MODES.RACE_THREE]: 'Race (3 Orders)'
+}
+
 export const GAME_TYPE_LABELS = {
   [GAME_TYPES.CLASSIC]: 'Classic',
   [GAME_TYPES.SPEED]: 'Speed',

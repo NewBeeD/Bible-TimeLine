@@ -91,6 +91,13 @@ export const PvpResults = () => {
   }
 
   const board = finalBoard?.leaderboard || results?.leaderboard || []
+  const podium = board.slice(0, 3)
+  const medalForIndex = (index) => {
+    if(index === 0){ return '🥇' }
+    if(index === 1){ return '🥈' }
+    if(index === 2){ return '🥉' }
+    return null
+  }
 
   const leaveGame = () => {
     const socket = getPvpSocket()
@@ -143,8 +150,9 @@ export const PvpResults = () => {
     <Box
       minHeight='100vh'
       sx={{
-        background: 'linear-gradient(135deg, #173174 0%, #1f2833 45%, #0b0c10 100%)',
-        py: { xs: 3, sm: 6 }
+        background: 'radial-gradient(circle at top, #06b6d4 0%, #4f46e5 40%, #0f172a 100%)',
+        py: { xs: 3, sm: 6 },
+        px: { xs: 1.5, sm: 2.5 }
       }}
     >
       <Container maxWidth='md'>
@@ -152,23 +160,94 @@ export const PvpResults = () => {
           elevation={8}
           sx={{
             p: { xs: 2.5, sm: 4 },
-            borderRadius: 3,
-            backgroundColor: 'rgba(11, 12, 16, 0.9)',
-            border: '1px solid rgba(255,255,255,0.12)'
+            borderRadius: 3.2,
+            backgroundColor: 'rgba(255,255,255,0.10)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            backdropFilter: 'blur(10px)'
           }}
         >
           <Stack spacing={2.2}>
             <Stack direction='row' alignItems='center' justifyContent='space-between'>
               <Typography variant='h5' sx={{ color: 'white', fontWeight: 700 }}>
-                {finalBoard ? 'Final Leaderboard 🏆' : `Round ${results?.roundNumber || '-'} Results`}
+                {finalBoard ? '🎉 Final Podium' : `🏁 Leaderboard - Round ${results?.roundNumber || '-'}`}
               </Typography>
               <Stack direction='row' spacing={1}>
                 <PvpConnectionBadge />
-                <Button size='small' variant='outlined' color='error' onClick={handleExitClick}>Exit Game</Button>
+                <Button size='small' variant='outlined' color='error' onClick={handleExitClick} sx={{ borderColor: 'rgba(255,255,255,0.35)', color: 'white' }}>Exit</Button>
               </Stack>
             </Stack>
 
             {error && <Alert severity='error'>{error}</Alert>}
+
+            {finalBoard && podium.length > 0 && (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} alignItems={{ xs: 'stretch', sm: 'flex-end' }}>
+                {podium[1] && (
+                  <Paper
+                    key={`podium-${podium[1].playerId}`}
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      flex: 1,
+                      borderRadius: 2.4,
+                      minHeight: { sm: 112 },
+                      border: '1px solid rgba(203,213,225,0.65)',
+                      background: 'linear-gradient(135deg, rgba(203,213,225,0.32), rgba(71,85,105,0.24))'
+                    }}
+                  >
+                    <Stack spacing={0.7} alignItems='center'>
+                      <Typography sx={{ color: 'white', fontWeight: 700 }}>🥈</Typography>
+                      <Avatar src={podium[1].avatar || ''} alt={podium[1].name} />
+                      <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[1].name}</Typography>
+                      <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[1].totalPoints || 0} pts</Typography>
+                    </Stack>
+                  </Paper>
+                )}
+
+                {podium[0] && (
+                  <Paper
+                    key={`podium-${podium[0].playerId}`}
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      flex: 1,
+                      borderRadius: 2.4,
+                      minHeight: { sm: 144 },
+                      border: '1px solid rgba(253,224,71,0.75)',
+                      background: 'linear-gradient(135deg, rgba(250,204,21,0.34), rgba(249,115,22,0.24))'
+                    }}
+                  >
+                    <Stack spacing={0.7} alignItems='center'>
+                      <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '1.4rem' }}>🥇</Typography>
+                      <Avatar src={podium[0].avatar || ''} alt={podium[0].name} />
+                      <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[0].name}</Typography>
+                      <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[0].totalPoints || 0} pts</Typography>
+                    </Stack>
+                  </Paper>
+                )}
+
+                {podium[2] && (
+                  <Paper
+                    key={`podium-${podium[2].playerId}`}
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      flex: 1,
+                      borderRadius: 2.4,
+                      minHeight: { sm: 96 },
+                      border: '1px solid rgba(217,119,6,0.75)',
+                      background: 'linear-gradient(135deg, rgba(245,158,11,0.3), rgba(194,65,12,0.25))'
+                    }}
+                  >
+                    <Stack spacing={0.7} alignItems='center'>
+                      <Typography sx={{ color: 'white', fontWeight: 700 }}>🥉</Typography>
+                      <Avatar src={podium[2].avatar || ''} alt={podium[2].name} />
+                      <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[2].name}</Typography>
+                      <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[2].totalPoints || 0} pts</Typography>
+                    </Stack>
+                  </Paper>
+                )}
+              </Stack>
+            )}
 
             <Stack spacing={1}>
               {board.map((entry, index) => (
@@ -178,28 +257,24 @@ export const PvpResults = () => {
                   sx={{
                     p: 1.5,
                     borderRadius: 2,
-                    border: '1px solid rgba(255,255,255,0.16)',
-                    backgroundColor: index === 0 ? 'rgba(25, 118, 210, 0.2)' : 'rgba(255,255,255,0.04)'
+                    border: index === 0 ? '1px solid rgba(253,224,71,0.65)' : '1px solid rgba(255,255,255,0.22)',
+                    backgroundColor: index === 0 ? 'rgba(250,204,21,0.14)' : 'rgba(255,255,255,0.10)'
                   }}
                 >
                   <Stack direction='row' spacing={1.5} alignItems='center' justifyContent='space-between'>
                     <Stack direction='row' spacing={1.2} alignItems='center'>
-                      <Chip size='small' label={index + 1} color={index === 0 ? 'secondary' : 'default'} sx={{ color: index === 0 ? 'white' : '#f3f4f6' }} />
-                      <Avatar src={entry.avatar || ''} alt={entry.name} />
+                      <Chip size='small' label={medalForIndex(index) ? `${medalForIndex(index)} ${index + 1}` : `${index + 1}`} color={index === 0 ? 'secondary' : 'default'} sx={{ color: index === 0 ? 'white' : '#f3f4f6' }} />
                       <Typography sx={{ color: 'white', fontWeight: 600 }}>{entry.name}</Typography>
                     </Stack>
 
-                    <Stack direction='row' spacing={1}>
-                      {!finalBoard && <Chip label={`Round: ${entry.roundPoints || 0}`} size='small' variant='outlined' sx={{ color: '#f3f4f6' }} />}
-                      <Chip label={`Total: ${entry.totalPoints || 0}`} size='small' color='secondary' sx={{ color: 'white' }} />
-                    </Stack>
+                    <Typography sx={{ color: 'white', fontWeight: 700, minWidth: 72, textAlign: 'right' }}>{entry.totalPoints || 0} pts</Typography>
                   </Stack>
                 </Paper>
               ))}
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              {!finalBoard && amHost && <Button variant='contained' fullWidth onClick={nextRound}>Next Round</Button>}
+              {!finalBoard && amHost && <Button variant='contained' fullWidth onClick={nextRound} sx={{ background: 'linear-gradient(90deg, #d946ef, #06b6d4)', color: 'white', fontWeight: 700 }}>Next Round</Button>}
               {!finalBoard && !amHost && <Typography sx={{ color: 'grey.300', alignSelf: 'center' }}>Waiting for host to continue...</Typography>}
             </Stack>
 
