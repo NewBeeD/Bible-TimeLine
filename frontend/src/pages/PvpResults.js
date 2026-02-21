@@ -99,6 +99,23 @@ export const PvpResults = () => {
     return null
   }
 
+  const avatarSx = {
+    width: 38,
+    height: 38,
+    fontSize: '1rem',
+    bgcolor: 'rgba(255,255,255,0.18)',
+    animation: 'pvpAvatarBob 0.95s ease-in-out infinite alternate, pvpAvatarSway 1.2s ease-in-out infinite',
+    '@keyframes pvpAvatarBob': {
+      '0%': { transform: 'translateY(0px)' },
+      '100%': { transform: 'translateY(-4px)' }
+    },
+    '@keyframes pvpAvatarSway': {
+      '0%': { rotate: '-3deg' },
+      '50%': { rotate: '3deg' },
+      '100%': { rotate: '-3deg' }
+    }
+  }
+
   const leaveGame = () => {
     const socket = getPvpSocket()
     socket.emit('leave_room', { roomCode, playerId })
@@ -196,7 +213,9 @@ export const PvpResults = () => {
                   >
                     <Stack spacing={0.7} alignItems='center'>
                       <Typography sx={{ color: 'white', fontWeight: 700 }}>🥈</Typography>
-                      <Avatar src={podium[1].avatar || ''} alt={podium[1].name} />
+                      <Avatar src={podium[1].avatar || ''} alt={podium[1].name} sx={avatarSx}>
+                        {!podium[1].avatar && (podium[1].avatarEmoji || '🕺🐶')}
+                      </Avatar>
                       <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[1].name}</Typography>
                       <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[1].totalPoints || 0} pts</Typography>
                     </Stack>
@@ -218,7 +237,9 @@ export const PvpResults = () => {
                   >
                     <Stack spacing={0.7} alignItems='center'>
                       <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '1.4rem' }}>🥇</Typography>
-                      <Avatar src={podium[0].avatar || ''} alt={podium[0].name} />
+                      <Avatar src={podium[0].avatar || ''} alt={podium[0].name} sx={avatarSx}>
+                        {!podium[0].avatar && (podium[0].avatarEmoji || '🕺🐶')}
+                      </Avatar>
                       <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[0].name}</Typography>
                       <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[0].totalPoints || 0} pts</Typography>
                     </Stack>
@@ -240,7 +261,9 @@ export const PvpResults = () => {
                   >
                     <Stack spacing={0.7} alignItems='center'>
                       <Typography sx={{ color: 'white', fontWeight: 700 }}>🥉</Typography>
-                      <Avatar src={podium[2].avatar || ''} alt={podium[2].name} />
+                      <Avatar src={podium[2].avatar || ''} alt={podium[2].name} sx={avatarSx}>
+                        {!podium[2].avatar && (podium[2].avatarEmoji || '🕺🐶')}
+                      </Avatar>
                       <Typography sx={{ color: 'white', fontWeight: 700 }}>{podium[2].name}</Typography>
                       <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.86rem' }}>{podium[2].totalPoints || 0} pts</Typography>
                     </Stack>
@@ -264,6 +287,9 @@ export const PvpResults = () => {
                   <Stack direction='row' spacing={1.5} alignItems='center' justifyContent='space-between'>
                     <Stack direction='row' spacing={1.2} alignItems='center'>
                       <Chip size='small' label={medalForIndex(index) ? `${medalForIndex(index)} ${index + 1}` : `${index + 1}`} color={index === 0 ? 'secondary' : 'default'} sx={{ color: index === 0 ? 'white' : '#f3f4f6' }} />
+                      <Avatar src={entry.avatar || ''} alt={entry.name} sx={avatarSx}>
+                        {!entry.avatar && (entry.avatarEmoji || '🕺🐶')}
+                      </Avatar>
                       <Typography sx={{ color: 'white', fontWeight: 600 }}>{entry.name}</Typography>
                     </Stack>
 

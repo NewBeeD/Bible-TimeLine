@@ -301,10 +301,10 @@ export const Gamepage = () => {
           </Toolbar>
         </AppBar>
 
-    <Dialog open={open} >
+        <Dialog open={open} >
 
-          <DialogTitle><Typography variant="h4">How to Play</Typography></DialogTitle>
-          <DialogTitle><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
+          <DialogTitle component='div' sx={{ pb: 1 }}><Typography variant="h4">How to Play</Typography></DialogTitle>
+          <DialogTitle component='div' sx={{ pt: 0 }}><Typography variant="h5">Find the order of events in {difficulty.diffMode.level} moves</Typography></DialogTitle>
 
           <DialogContent>
             <DialogContentText>Simply drag and drop events in their chronological order.</DialogContentText>

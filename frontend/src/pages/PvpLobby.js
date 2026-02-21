@@ -5,7 +5,7 @@ import { getPvpSocket } from '../modules/pvpSocket'
 import { PvpConnectionBadge } from '../components/PvpConnectionBadge'
 import { PVP_MODES } from '../modules/gameModes'
 
-const AVATARS = ['🕺', '💃', '🦊', '🦄', '🐼', '🦉', '🐯', '🐸', '🐬', '🐙']
+const AVATARS = ['🕺🐶', '💃🐱', '🕺🦊', '💃🐼', '🕺🦁', '💃🐨', '🕺🐸', '💃🦄', '🕺🐵', '💃🐯']
 
 export const PvpLobby = () => {
   const location = useLocation()
@@ -159,7 +159,7 @@ export const PvpLobby = () => {
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
-              <Button variant='outlined' onClick={copyCode} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.35)' }}>Copy Code</Button>
+              <Button variant='outlined' onClick={copyCode} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.55)', backgroundColor: 'rgba(255,255,255,0.06)' }}>Copy Code</Button>
             </Stack>
 
             {room?.settings && (
@@ -167,9 +167,9 @@ export const PvpLobby = () => {
                 <Chip
                   label={room.settings.pvpMode === PVP_MODES.RACE_THREE ? 'Mode: Race (3 Orders)' : 'Mode: Classic PvP'}
                   color='default'
-                  sx={{ color: '#f3f4f6' }}
+                  sx={{ color: '#f3f4f6', backgroundColor: 'rgba(15, 23, 42, 0.55)', border: '1px solid rgba(255,255,255,0.2)' }}
                 />
-                <Chip label={`Rounds: ${room.settings.roundPlan?.length || 0}`} color='default' sx={{ color: '#f3f4f6' }} />
+                <Chip label={`Rounds: ${room.settings.roundPlan?.length || 0}`} color='default' sx={{ color: '#f3f4f6', backgroundColor: 'rgba(15, 23, 42, 0.55)', border: '1px solid rgba(255,255,255,0.2)' }} />
               </Stack>
             )}
 
@@ -209,7 +209,7 @@ export const PvpLobby = () => {
                           }
                         }}
                       >
-                        {!player.avatar && avatarForUser(player.playerId || player.name || '')}
+                        {!player.avatar && (player.avatarEmoji || avatarForUser(player.playerId || player.name || ''))}
                       </Avatar>
                       <Stack spacing={0.5} alignItems='center'>
                         <Typography sx={{ color: 'white', fontWeight: 700 }}>{player.name}</Typography>

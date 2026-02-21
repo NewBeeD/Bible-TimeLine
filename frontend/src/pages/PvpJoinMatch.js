@@ -1,16 +1,28 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, Container, Paper, Stack, TextField, Typography } from '@mui/material'
-import { auth } from '../firebaseAuth/firebaseSDK'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded'
 import { ensurePvpSocketConnected, emitPvpAck, getPvpServerUrl } from '../modules/pvpSocket'
 import { PvpConnectionBadge } from '../components/PvpConnectionBadge'
+import { getPvpAnimalAvatars, loadPvpIdentity, savePvpIdentity } from '../modules/pvpIdentity'
 
 export const PvpJoinMatch = () => {
   const navigate = useNavigate()
-  const [displayName, setDisplayName] = useState(auth.currentUser?.displayName || 'Player')
+  const avatars = getPvpAnimalAvatars()
+  const initialIdentity = loadPvpIdentity()
+  const [displayName, setDisplayName] = useState(initialIdentity.name)
+  const [avatarIndex, setAvatarIndex] = useState(initialIdentity.avatarIndex)
   const [roomCode, setRoomCode] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  const cycleAvatar = (step) => {
+    setAvatarIndex((previous) => {
+      const count = avatars.length
+      return (previous + step + count) % count
+    })
+  }
 
   const joinGame = async () => {
     if(submitting){
@@ -27,8 +39,9 @@ export const PvpJoinMatch = () => {
         roomCode: roomCode.trim(),
         player: {
           name: displayName || 'Player',
-          avatar: auth.currentUser?.photoURL || '',
-          uid: auth.currentUser?.uid || null
+          avatar: '',
+          avatarEmoji: avatars[avatarIndex],
+          uid: null
         }
       })
 
@@ -36,6 +49,11 @@ export const PvpJoinMatch = () => {
         setError(response?.error || 'Could not join game room')
         return
       }
+
+      savePvpIdentity({
+        name: displayName,
+        avatarIndex
+      })
 
       navigate('/pvp/lobby', {
         state: {
@@ -87,10 +105,22 @@ export const PvpJoinMatch = () => {
               fullWidth
               size='small'
               sx={{
-                '& .MuiInputLabel-root': { color: 'grey.400' },
-                '& .MuiInputBase-input': { color: 'white' }
+                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.85)' },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.38)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.58)' },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.78)' }
               }}
             />
+
+            <Paper elevation={0} sx={{ p: 1.3, borderRadius: 2, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)' }}>
+              <Typography sx={{ color: 'grey.200', fontWeight: 700, mb: 1 }}>Dancing animal avatar</Typography>
+              <Stack direction='row' spacing={1.3} alignItems='center' justifyContent='center'>
+                <Button variant='outlined' onClick={() => cycleAvatar(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><RemoveRoundedIcon /></Button>
+                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '1.25rem', minWidth: 88, textAlign: 'center' }}>{avatars[avatarIndex]}</Typography>
+                <Button variant='outlined' onClick={() => cycleAvatar(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><AddRoundedIcon /></Button>
+              </Stack>
+            </Paper>
 
             <TextField
               label='6 digit room code'
@@ -99,8 +129,11 @@ export const PvpJoinMatch = () => {
               fullWidth
               size='small'
               sx={{
-                '& .MuiInputLabel-root': { color: 'grey.400' },
-                '& .MuiInputBase-input': { color: 'white', letterSpacing: '0.2em' }
+                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.85)' },
+                '& .MuiInputBase-input': { color: 'white', letterSpacing: '0.2em' },
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.38)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.58)' },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.78)' }
               }}
               inputProps={{ inputMode: 'numeric' }}
             />
@@ -108,7 +141,7 @@ export const PvpJoinMatch = () => {
             {error && <Alert severity='error'>{error}</Alert>}
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              <Button variant='outlined' fullWidth onClick={() => navigate('/')}>Back</Button>
+              <Button variant='outlined' fullWidth onClick={() => navigate('/')} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.55)', backgroundColor: 'rgba(255,255,255,0.05)' }}>Back</Button>
               <Button variant='contained' fullWidth onClick={joinGame} disabled={submitting || roomCode.length !== 6}>
                 {submitting ? 'Joining...' : 'Join Lobby'}
               </Button>

@@ -1,5 +1,5 @@
-import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Paper, Chip } from '@mui/material'
-import { Link, useNavigate } from 'react-router-dom'
+import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Paper, Chip, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
 import { useTimeLineContext } from "../hooks/useTimeLineContext"
@@ -67,6 +67,39 @@ export const PageTitle = () => {
 
   const joinPvpGame = () => {
     navigate('/pvp/join')
+  }
+
+  const selectedCategory = active === 1 ? 'Old Testament' : active === 2 ? 'New Testament' : 'Mixed'
+  const selectedDifficulty = mode.level === 4 ? 'Easy' : mode.level === 5 ? 'Medium' : 'Hard'
+  const selectedMode = gameType === GAME_TYPES.PVP ? 'PvP' : gameType === GAME_TYPES.SPEED ? 'Speed' : 'Classic'
+  const requiresSignin = gameType !== GAME_TYPES.PVP
+
+  const toggleGroupSx = {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 2.5,
+    p: 0.4,
+    '& .MuiToggleButton-root': {
+      color: 'rgba(255,255,255,0.96)',
+      borderColor: 'rgba(255,255,255,0.35)',
+      fontWeight: 700,
+      textTransform: 'none',
+      backgroundColor: 'rgba(255,255,255,0.04)',
+      borderRadius: 1.6
+    },
+    '& .MuiToggleButton-root.Mui-selected': {
+      backgroundColor: 'rgba(66, 165, 245, 0.35)',
+      color: 'white',
+      borderColor: 'rgba(144, 202, 249, 0.95)',
+      boxShadow: 'inset 0 0 0 1px rgba(144, 202, 249, 0.35)'
+    },
+    '& .MuiToggleButton-root:hover': {
+      backgroundColor: 'rgba(255,255,255,0.16)',
+      borderColor: 'rgba(255,255,255,0.7)'
+    },
+    '& .MuiToggleButton-root.Mui-selected:hover': {
+      backgroundColor: 'rgba(66, 165, 245, 0.45)',
+      borderColor: 'rgba(187, 222, 251, 1)'
+    }
   }
 
   useEffect(()=>{
@@ -147,9 +180,10 @@ export const PageTitle = () => {
           width: '100%',
           maxWidth: 820,
           borderRadius: 4,
-          p: { xs: 2.2, sm: 3.2 },
-          backgroundColor: 'rgba(11, 12, 16, 0.88)',
-          border: '1px solid rgba(255,255,255,0.12)'
+          p: { xs: 2.6, sm: 3.4 },
+          background: 'linear-gradient(180deg, rgba(2, 6, 23, 0.97) 0%, rgba(15, 23, 42, 0.94) 100%)',
+          border: '1px solid rgba(255,255,255,0.34)',
+          boxShadow: '0 20px 45px rgba(0,0,0,0.55)'
         }}
       >
         <Stack spacing={2.4}>
@@ -158,85 +192,103 @@ export const PageTitle = () => {
               <Typography component='h1' sx={{ typography: { sm: 'h3', xs: 'h4' }, color: 'white', fontWeight: 700 }}>
                 Bible TimeLine
               </Typography>
-              <Typography sx={{ color: 'grey.300' }}>
-                Pick a category, difficulty and mode to start.
+              <Typography sx={{ color: 'rgba(255,255,255,0.9)', mt: 0.5 }}>
+                Choose your setup and jump in.
               </Typography>
             </Box>
             {!showSigninBtn && <Chip label={`Welcome ${name || 'Player'}`} color='secondary' sx={{ color: 'white' }} />}
           </Stack>
 
-          <Box>
-            <HighscoreDisplay highscore={highScore}/>
+          <Box sx={{
+            border: '1px solid rgba(144, 202, 249, 0.55)',
+            borderRadius: 3,
+            py: 1.5,
+            px: 2,
+            textAlign: 'center',
+            backgroundColor: 'rgba(30, 41, 59, 0.86)'
+          }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.82)', letterSpacing: 1, textTransform: 'uppercase', fontSize: 12 }}>
+              Current Setup
+            </Typography>
+            <Typography sx={{ color: 'white', mt: 0.4, fontWeight: 600 }}>
+              {selectedCategory} · {selectedDifficulty} · {selectedMode}
+            </Typography>
           </Box>
 
-          {!showSigninBtn &&
-            <Stack direction='row' spacing={1.2}>
-              <Link to='/leaderboard' style={{textDecoration: 'none', width: '100%'}}>
-                <Button variant='contained' fullWidth>
-                  <Typography sx={{ color: 'white', letterSpacing: 1.2}}>Open Leaderboard</Typography>
-                </Button>
-              </Link>
-            </Stack>
-          }
+          <HighscoreDisplay highscore={highScore}/>
 
           <Stack spacing={1.2}>
-            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Category</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
-              <Button variant={active === 1 ? 'contained' : 'outlined'} onClick={() => setActive(1)} fullWidth>
-                <Typography sx={{color: 'white', fontWeight: 'bold'}}>Old Testament</Typography>
-              </Button>
-              <Button variant={active === 2 ? 'contained' : 'outlined'} onClick={() => setActive(2)} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>New Testament</Typography>
-              </Button>
-              <Button variant={active === 3 ? 'contained' : 'outlined'} onClick={() => setActive(3)} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Mixed</Typography>
-              </Button>
-            </Stack>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Category</Typography>
+            <ToggleButtonGroup
+              exclusive
+              value={active}
+              onChange={(_, newValue) => newValue && setActive(newValue)}
+              fullWidth
+              sx={toggleGroupSx}
+            >
+              <ToggleButton value={1}>Old Testament</ToggleButton>
+              <ToggleButton value={2}>New Testament</ToggleButton>
+              <ToggleButton value={3}>Mixed</ToggleButton>
+            </ToggleButtonGroup>
           </Stack>
 
           <Stack spacing={1.2}>
-            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Difficulty</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
-              <Button variant={mode.level === 4 ? 'contained' : 'outlined'} onClick={() => setMode({level: 4, time:30})} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Easy</Typography>
-              </Button>
-              <Button variant={mode.level === 5 ? 'contained' : 'outlined'} onClick={() => setMode({level: 5, time:40})} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Medium</Typography>
-              </Button>
-              <Button variant={mode.level === 6 ? 'contained' : 'outlined'} onClick={() => setMode({level: 6, time:50})} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Hard</Typography>
-              </Button>
-            </Stack>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Difficulty</Typography>
+            <ToggleButtonGroup
+              exclusive
+              value={mode.level}
+              onChange={(_, newValue) => {
+                if(newValue === 4){ setMode({level: 4, time: 30}) }
+                if(newValue === 5){ setMode({level: 5, time: 40}) }
+                if(newValue === 6){ setMode({level: 6, time: 50}) }
+              }}
+              fullWidth
+              sx={toggleGroupSx}
+            >
+              <ToggleButton value={4}>Easy</ToggleButton>
+              <ToggleButton value={5}>Medium</ToggleButton>
+              <ToggleButton value={6}>Hard</ToggleButton>
+            </ToggleButtonGroup>
           </Stack>
 
           <Stack spacing={1.2}>
-            <Typography sx={{ color: 'grey.300', fontWeight: 600 }}>Game Mode</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
-              <Button variant={gameType === GAME_TYPES.CLASSIC ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.CLASSIC)} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Classic</Typography>
-              </Button>
-              <Button variant={gameType === GAME_TYPES.SPEED ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.SPEED)} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>Speed</Typography>
-              </Button>
-              <Button variant={gameType === GAME_TYPES.PVP ? 'contained' : 'outlined'} onClick={() => setGameType(GAME_TYPES.PVP)} fullWidth>
-                <Typography variant='body1' sx={{color: 'white', fontWeight: 'bold'}}>PvP</Typography>
-              </Button>
-            </Stack>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Game Mode</Typography>
+            <ToggleButtonGroup
+              exclusive
+              value={gameType}
+              onChange={(_, newValue) => newValue && setGameType(newValue)}
+              fullWidth
+              sx={toggleGroupSx}
+            >
+              <ToggleButton value={GAME_TYPES.CLASSIC}>Classic</ToggleButton>
+              <ToggleButton value={GAME_TYPES.SPEED}>Speed</ToggleButton>
+              <ToggleButton value={GAME_TYPES.PVP}>PvP</ToggleButton>
+            </ToggleButtonGroup>
           </Stack>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2}>
-            <Button variant='outlined' fullWidth onClick={() => setHowToPlayOpen(true)}><Typography sx={{color: 'white'}}>How to Play</Typography></Button>
-            <Button variant='contained' fullWidth onClick={startGame} disabled={showSigninBtn}><Typography variant='h6' sx={{color: 'white'}}>{gameType === GAME_TYPES.PVP ? 'Create Match' : 'Start Game'}</Typography></Button>
+            <Button variant='contained' fullWidth onClick={startGame} disabled={requiresSignin && showSigninBtn} sx={{ background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)', '&.Mui-disabled': { color: 'rgba(255,255,255,0.65)', backgroundColor: 'rgba(255,255,255,0.2)' } }}><Typography variant='h6' sx={{color: 'white'}}>{gameType === GAME_TYPES.PVP ? 'Create Match' : 'Start Game'}</Typography></Button>
             {gameType === GAME_TYPES.PVP &&
-              <Button variant='contained' color='secondary' fullWidth onClick={joinPvpGame} disabled={showSigninBtn}>
+              <Button variant='contained' color='secondary' fullWidth onClick={joinPvpGame} sx={{ background: 'linear-gradient(90deg, #7c4dff 0%, #1976d2 100%)', '&.Mui-disabled': { color: 'rgba(255,255,255,0.65)', backgroundColor: 'rgba(255,255,255,0.2)' } }}>
                 <Typography sx={{color: 'white'}}>Join Match</Typography>
               </Button>
             }
+            <Button variant='outlined' fullWidth onClick={() => setHowToPlayOpen(true)} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.6)', backgroundColor: 'rgba(15, 23, 42, 0.78)' }}><Typography sx={{color: 'white'}}>How to Play</Typography></Button>
           </Stack>
 
+          {!showSigninBtn &&
+            <Stack direction='row' spacing={1.2}>
+              <Button variant='outlined' fullWidth onClick={() => navigate('/leaderboard')} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.6)', backgroundColor: 'rgba(15, 23, 42, 0.78)' }}>
+                <Typography sx={{ color: 'white', letterSpacing: 1.2}}>Leaderboard</Typography>
+              </Button>
+            </Stack>
+          }
+
         <Dialog open={howToPlayOpen} onClose={() => setHowToPlayOpen(false)}>
-          <DialogTitle><Typography variant='h5'>How to Play</Typography></DialogTitle>
-          <DialogTitle>
+          <DialogTitle component='div' sx={{ pb: 1 }}>
+            <Typography variant='h5'>How to Play</Typography>
+          </DialogTitle>
+          <DialogTitle component='div' sx={{ pt: 0 }}>
             <Typography variant='body1'>Current selection: {gameType === GAME_TYPES.PVP ? 'PvP' : gameType === GAME_TYPES.SPEED ? 'Speed' : 'Classic'}</Typography>
           </DialogTitle>
 
@@ -281,7 +333,7 @@ export const PageTitle = () => {
           </DialogActions>
         </Dialog>
 
-        {showSigninBtn && 
+        {showSigninBtn && requiresSignin && 
         <Stack marginTop={1}>
           <Typography sx={{ color: 'white', textAlign: 'center' }}>Sign in to save scores to leaderboard</Typography>
         </Stack>
@@ -291,12 +343,12 @@ export const PageTitle = () => {
 
           {/* <Button variant='contained'><Typography sx={{ color: 'white'}}>SignIn</Typography></Button> */}
 
-          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle}><Typography sx={{ color: 'white', letterSpacing: 2}}>Sign In with Google</Typography></Button>)}
+          {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle} sx={{ backgroundColor: 'secondary.main' }}><Typography sx={{ color: 'white', letterSpacing: 2}}>Sign In with Google</Typography></Button>)}
 
         </Stack>
 
         {!showSigninBtn && <Stack marginTop={1}>
-          <Button variant='outlined' color='inherit' onClick={signOutUser}><Typography sx={{ letterSpacing: 1, color: 'white'}}>Logout</Typography></Button>
+          <Button variant='outlined' onClick={signOutUser} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.6)', backgroundColor: 'rgba(15, 23, 42, 0.78)' }}><Typography sx={{ letterSpacing: 1, color: 'white'}}>Logout</Typography></Button>
         </Stack>}
 
       </Stack>

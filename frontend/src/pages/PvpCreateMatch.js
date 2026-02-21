@@ -3,17 +3,20 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Box, Button, Container, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded'
-import { auth } from '../firebaseAuth/firebaseSDK'
 import { ensurePvpSocketConnected, emitPvpAck, getPvpServerUrl } from '../modules/pvpSocket'
 import { GAME_TYPES, PVP_MODES } from '../modules/gameModes'
 import { PvpConnectionBadge } from '../components/PvpConnectionBadge'
+import { getPvpAnimalAvatars, loadPvpIdentity, savePvpIdentity } from '../modules/pvpIdentity'
 
 export const PvpCreateMatch = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const avatars = getPvpAnimalAvatars()
+  const initialIdentity = loadPvpIdentity()
 
   const selected = location.state || { data: 2, diffMode: { level: 4, time: 30 }, gameType: GAME_TYPES.PVP }
-  const [displayName, setDisplayName] = useState(auth.currentUser?.displayName || 'Player')
+  const [displayName, setDisplayName] = useState(initialIdentity.name)
+  const [avatarIndex, setAvatarIndex] = useState(initialIdentity.avatarIndex)
   const [maxPlayers, setMaxPlayers] = useState(4)
   const [roundCount, setRoundCount] = useState(6)
   const [pvpMode, setPvpMode] = useState(PVP_MODES.CLASSIC)
@@ -34,6 +37,13 @@ export const PvpCreateMatch = () => {
     setMaxPlayers((previous) => Math.min(20, Math.max(2, previous + step)))
   }
 
+  const cycleAvatar = (step) => {
+    setAvatarIndex((previous) => {
+      const count = avatars.length
+      return (previous + step + count) % count
+    })
+  }
+
   const createGame = async () => {
     if(submitting){
       return
@@ -51,8 +61,9 @@ export const PvpCreateMatch = () => {
       const response = await emitPvpAck(socket, 'create_room', {
         host: {
           name: displayName || 'Player',
-          avatar: auth.currentUser?.photoURL || '',
-          uid: auth.currentUser?.uid || null
+          avatar: '',
+          avatarEmoji: avatars[avatarIndex],
+          uid: null
         },
         settings: {
           category: selected.data,
@@ -66,6 +77,11 @@ export const PvpCreateMatch = () => {
         setError(response?.error || 'Could not create game room')
         return
       }
+
+      savePvpIdentity({
+        name: displayName,
+        avatarIndex
+      })
 
       navigate('/pvp/lobby', {
         state: {
@@ -110,10 +126,10 @@ export const PvpCreateMatch = () => {
               <PvpConnectionBadge />
             </Stack>
 
-            <Typography sx={{ color: 'grey.300', textAlign: 'center' }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', textAlign: 'center' }}>
               Choose a PvP mode and number of rounds.
             </Typography>
-            <Typography sx={{ color: 'grey.300', textAlign: 'center' }}>Category: {categoryName}</Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.9)', textAlign: 'center' }}>Category: {categoryName}</Typography>
 
             <TextField
               label='Display name'
@@ -122,13 +138,25 @@ export const PvpCreateMatch = () => {
               fullWidth
               size='small'
               sx={{
-                '& .MuiInputLabel-root': { color: 'grey.400' },
-                '& .MuiInputBase-input': { color: 'white' }
+                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.85)' },
+                '& .MuiInputBase-input': { color: 'white' },
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.38)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.58)' },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.78)' }
               }}
             />
 
+            <Paper elevation={0} sx={{ p: 1.3, borderRadius: 2, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)' }}>
+              <Typography sx={{ color: 'grey.200', fontWeight: 700, mb: 1 }}>Dancing animal avatar</Typography>
+              <Stack direction='row' spacing={1.3} alignItems='center' justifyContent='center'>
+                <Button variant='outlined' onClick={() => cycleAvatar(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><RemoveRoundedIcon /></Button>
+                <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '1.25rem', minWidth: 88, textAlign: 'center' }}>{avatars[avatarIndex]}</Typography>
+                <Button variant='outlined' onClick={() => cycleAvatar(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><AddRoundedIcon /></Button>
+              </Stack>
+            </Paper>
+
             <FormControl fullWidth size='medium'>
-              <InputLabel id='pvp-mode-label' sx={{ color: 'grey.400' }}>PvP mode</InputLabel>
+              <InputLabel id='pvp-mode-label' sx={{ color: 'rgba(255,255,255,0.85)' }}>PvP mode</InputLabel>
               <Select
               labelId='pvp-mode-label'
               label='PvP mode'
@@ -161,29 +189,29 @@ export const PvpCreateMatch = () => {
               <Paper elevation={0} sx={{ flex: 1, p: 1.3, borderRadius: 2, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)' }}>
                 <Typography sx={{ color: 'grey.200', fontWeight: 700, mb: 1 }}>Number of rounds</Typography>
                 <Stack direction='row' spacing={1.3} alignItems='center' justifyContent='center'>
-                  <Button variant='outlined' onClick={() => adjustRounds(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.35)', color: 'white' }}><RemoveRoundedIcon /></Button>
+                  <Button variant='outlined' onClick={() => adjustRounds(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><RemoveRoundedIcon /></Button>
                   <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '1.25rem', minWidth: 40, textAlign: 'center' }}>{roundCount}</Typography>
-                  <Button variant='outlined' onClick={() => adjustRounds(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.35)', color: 'white' }}><AddRoundedIcon /></Button>
+                  <Button variant='outlined' onClick={() => adjustRounds(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><AddRoundedIcon /></Button>
                 </Stack>
               </Paper>
 
               <Paper elevation={0} sx={{ flex: 1, p: 1.3, borderRadius: 2, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.08)' }}>
                 <Typography sx={{ color: 'grey.200', fontWeight: 700, mb: 1 }}>Max players</Typography>
                 <Stack direction='row' spacing={1.3} alignItems='center' justifyContent='center'>
-                  <Button variant='outlined' onClick={() => adjustMaxPlayers(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.35)', color: 'white' }}><RemoveRoundedIcon /></Button>
+                  <Button variant='outlined' onClick={() => adjustMaxPlayers(-1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><RemoveRoundedIcon /></Button>
                   <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '1.25rem', minWidth: 40, textAlign: 'center' }}>{maxPlayers}</Typography>
-                  <Button variant='outlined' onClick={() => adjustMaxPlayers(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.35)', color: 'white' }}><AddRoundedIcon /></Button>
+                  <Button variant='outlined' onClick={() => adjustMaxPlayers(1)} sx={{ minWidth: 54, height: 46, borderColor: 'rgba(255,255,255,0.5)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}><AddRoundedIcon /></Button>
                 </Stack>
               </Paper>
             </Stack>
 
             {error && <Alert severity='error'>{error}</Alert>}
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              <Button variant='outlined' fullWidth onClick={() => navigate('/')}>Back</Button>
+            <Stack spacing={1.5}>
               <Button variant='contained' fullWidth onClick={createGame} disabled={submitting}>
                 {submitting ? 'Creating...' : 'Create & Go To Lobby'}
               </Button>
+              <Button variant='outlined' fullWidth onClick={() => navigate('/')} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.55)', backgroundColor: 'rgba(255,255,255,0.05)' }}>Back</Button>
             </Stack>
           </Stack>
         </Paper>
