@@ -24,6 +24,7 @@ export const PvpRound = () => {
   const [error, setError] = useState('')
   const [hostPlayerId, setHostPlayerId] = useState(null)
   const [confirmExitOpen, setConfirmExitOpen] = useState(false)
+  const [classicLocked, setClassicLocked] = useState(false)
 
   const amHost = hostPlayerId === playerId
   const raceChallenges = round?.challenges || []
@@ -71,6 +72,7 @@ export const PvpRound = () => {
       setRound(payload)
       const incomingMode = payload?.pvpMode || PVP_MODES.CLASSIC
       setPvpMode(incomingMode)
+      setClassicLocked(false)
 
       if(incomingMode === PVP_MODES.RACE_THREE){
         hydrateRaceRound(payload)
@@ -108,6 +110,7 @@ export const PvpRound = () => {
       setPvpMode(incomingMode)
 
       if(payload?.activeRound){
+        const isNewRound = payload.activeRound.roundId !== round?.roundId
         setRound(payload.activeRound)
 
         if(incomingMode === PVP_MODES.RACE_THREE){
@@ -128,7 +131,9 @@ export const PvpRound = () => {
           return
         }
 
-        setData(payload.activeRound.events || [])
+        if(isNewRound || data.length === 0){
+          setData(payload.activeRound.events || [])
+        }
       }
     }
 
@@ -144,6 +149,7 @@ export const PvpRound = () => {
       if(payload?.isCorrect){
         if(!payload?.challengeId){
           setFeedback(`Correct! +${payload?.pointsAwarded || 0} points`)
+          setClassicLocked(true)
           return
         }
 
@@ -221,6 +227,10 @@ export const PvpRound = () => {
   }, [round])
 
   const handleDragDrop = (result) => {
+    if(pvpMode === PVP_MODES.CLASSIC && classicLocked){
+      return
+    }
+
     const { source, destination } = result
 
     if(!destination){
@@ -453,7 +463,7 @@ export const PvpRound = () => {
                         sx={{ width: '100%', textAlign: 'center', p: 0 }}
                       >
                         {data.map((point, index) => (
-                          <Draggable key={point.id} draggableId={point.id.toString()} index={index} shouldRespectForcePress={false}>
+                          <Draggable key={point.id} draggableId={point.id.toString()} index={index} shouldRespectForcePress={false} isDragDisabled={classicLocked}>
                             {(dragProvided) => (
                               <Paper
                                 ref={dragProvided.innerRef}
@@ -490,7 +500,7 @@ export const PvpRound = () => {
 
             {pvpMode === PVP_MODES.CLASSIC && (
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                <Button variant='contained' fullWidth onClick={submitClassicOrder} disabled={timeLeft <= 0}>
+                <Button variant='contained' fullWidth onClick={submitClassicOrder} disabled={timeLeft <= 0 || classicLocked}>
                   Submit
                 </Button>
               </Stack>
