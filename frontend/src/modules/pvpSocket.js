@@ -2,20 +2,56 @@ import { io } from 'socket.io-client'
 
 let socketInstance = null
 
+const isLocalHostname = (hostname) => {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0'
+}
+
+const getConfiguredPvpUrl = () => {
+  const configured = (process.env.REACT_APP_PVP_SERVER_URL || '').trim()
+  if(!configured){
+    return ''
+  }
+
+  try{
+    const parsed = new URL(configured)
+    if(parsed.protocol !== 'http:' && parsed.protocol !== 'https:'){
+      return ''
+    }
+    return parsed.toString().replace(/\/$/, '')
+  }
+  catch{
+    return ''
+  }
+}
+
 export const getPvpServerUrl = () => {
+  const configuredUrl = getConfiguredPvpUrl()
+
   if(typeof window !== 'undefined'){
     const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:'
     const hostname = window.location.hostname || 'localhost'
-    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0'
+    const isLocalhost = isLocalHostname(hostname)
     const hasExplicitPort = Boolean(window.location.port)
     const isBackendPort = window.location.port === '4000'
 
-    if(isLocalhost && !isBackendPort){
-      return `${protocol}//${hostname}:4000`
+    if(configuredUrl){
+      try{
+        const configuredHost = new URL(configuredUrl).hostname
+        const configuredIsLocal = isLocalHostname(configuredHost)
+
+        if(configuredIsLocal && !isLocalhost){
+          return window.location.origin
+        }
+
+        return configuredUrl
+      }
+      catch{
+        // fall through to automatic URL detection
+      }
     }
 
-    if(process.env.REACT_APP_PVP_SERVER_URL){
-      return process.env.REACT_APP_PVP_SERVER_URL
+    if(isLocalhost && !isBackendPort){
+      return `${protocol}//${hostname}:4000`
     }
 
     if(hasExplicitPort && !isBackendPort){
@@ -25,8 +61,8 @@ export const getPvpServerUrl = () => {
     return window.location.origin
   }
 
-  if(process.env.REACT_APP_PVP_SERVER_URL){
-    return process.env.REACT_APP_PVP_SERVER_URL
+  if(configuredUrl){
+    return configuredUrl
   }
 
   return 'http://localhost:4000'

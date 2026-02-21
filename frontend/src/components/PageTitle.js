@@ -1,4 +1,4 @@
-import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Paper, Chip, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Typography, Box, Stack, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Paper, Chip, ToggleButton, ToggleButtonGroup, Alert } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { HighscoreDisplay } from './HighscoreDisplay'
@@ -29,6 +29,7 @@ export const PageTitle = () => {
   const [showSigninBtn, setShowSignInBtn] = useState(true)
   const [name, setName] = useState('')
   const [howToPlayOpen, setHowToPlayOpen] = useState(false)
+  const [signinError, setSigninError] = useState('')
 
 
 
@@ -37,16 +38,37 @@ export const PageTitle = () => {
 
 
   const signinWithGoogle = () => {
+    setSigninError('')
 
     signInWithPopup(auth, provider)
     .then(() => {
       setShowSignInBtn(false)
     })
-    .catch((error) => console.log(error))
+    .catch((error) => {
+      const code = error?.code || ''
+
+      if(code === 'auth/unauthorized-domain'){
+        setSigninError('Google sign-in is not enabled for this domain yet. Add your deployed Render domain to Firebase Authentication -> Settings -> Authorized domains.')
+        return
+      }
+
+      if(code === 'auth/popup-blocked'){
+        setSigninError('Popup was blocked by the browser. Allow popups for this site and try again.')
+        return
+      }
+
+      if(code === 'auth/popup-closed-by-user'){
+        setSigninError('Sign-in popup was closed before completion. Please try again.')
+        return
+      }
+
+      setSigninError(error?.message || 'Google sign-in failed. Please try again.')
+    })
   }
 
 
   const signOutUser = () => {
+    setSigninError('')
 
     signOut(auth).then(() => {
       setShowSignInBtn(true)
@@ -110,6 +132,7 @@ export const PageTitle = () => {
 
       if(user){
         setShowSignInBtn(false)
+        setSigninError('')
         setName(user.displayName)
   
         const userData = ref(db, 'users/' + user.uid + '/data')
@@ -344,6 +367,10 @@ export const PageTitle = () => {
           {/* <Button variant='contained'><Typography sx={{ color: 'white'}}>SignIn</Typography></Button> */}
 
           {showSigninBtn &&  (<Button variant='contained' onClick={signinWithGoogle} sx={{ backgroundColor: 'secondary.main' }}><Typography sx={{ color: 'white', letterSpacing: 2}}>Sign In with Google</Typography></Button>)}
+
+          {showSigninBtn && signinError && (
+            <Alert severity='error' sx={{ mt: 0.4 }}>{signinError}</Alert>
+          )}
 
         </Stack>
 

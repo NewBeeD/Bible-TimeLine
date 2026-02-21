@@ -23,6 +23,16 @@ export const PvpCreateMatch = () => {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const getConnectionHelpText = () => {
+    const runningLocally = typeof window !== 'undefined' && ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname)
+
+    if(runningLocally){
+      return 'Start server (cd server ; npm install ; npm start) and try again.'
+    }
+
+    return 'Verify your Render service is live and REACT_APP_PVP_SERVER_URL is set to your deployed backend URL (or left empty for same-origin).'
+  }
+
   const categoryName = useMemo(() => {
     if(selected.data === 1){ return 'Old Testament' }
     if(selected.data === 2){ return 'New Testament' }
@@ -92,7 +102,7 @@ export const PvpCreateMatch = () => {
       })
     }
     catch(error){
-      setError(`Cannot reach PvP server at ${getPvpServerUrl()}. Start server (cd server ; npm install ; npm start) and try again.`)
+      setError(`Cannot reach PvP server at ${getPvpServerUrl()}. ${getConnectionHelpText()}`)
     }
     finally{
       setSubmitting(false)

@@ -25,8 +25,12 @@ This app is configured to run as a single Render **Web Service**:
    - `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
    - `REACT_APP_FIREBASE_APP_ID`
    - `REACT_APP_FIREBASE_MEASUREMENT_ID` (optional if unused)
+   - `REACT_APP_PVP_SERVER_URL` (optional; if omitted, frontend uses same origin)
    - `NODE_VERSION=20`
    - `NODE_ENV=production`
+
+6. In Firebase Console -> Authentication -> Settings -> Authorized domains:
+   - Add your Render hostname (for example, `your-app.onrender.com`) so Google popup sign-in can complete.
 
 ## Option B: Blueprint deploy (optional)
 
@@ -50,6 +54,7 @@ If you later prefer Blueprint, this repo includes `render.yaml` with the same co
 - If build fails with missing Firebase values, confirm all `REACT_APP_FIREBASE_*` env vars are set in Render.
 - If service fails to boot, confirm Start Command is `cd server && npm start`.
 - If health check fails, confirm Health Check Path is exactly `/health`.
+- If Google popup opens then closes immediately, verify your Render domain is in Firebase Authorized domains.
 - After changing env vars, trigger **Manual Deploy -> Deploy latest commit**.
 
 ## Notes
